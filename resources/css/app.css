@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+html,
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #F5F7FA;
+}
