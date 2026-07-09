@@ -9,25 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
+public function up()
 {
     Schema::create('content_translations', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('content_id')->constrained()->onDelete('cascade');
-        $table->foreignId('language_id')->constrained()->onDelete('cascade');
-        
-        // Data tekstual yang akan di-translate oleh AI
+        $table->unsignedBigInteger('content_id');
+        $table->unsignedBigInteger('language_id');
         $table->string('title');
-        $table->longText('body'); // Kolom longText ini yang menampung kode HTML dari Text Editor
+        $table->text('body')->nullable();
         $table->string('slug');
-        
         $table->timestamps();
-        
-        // Memastikan tidak ada duplikasi bahasa pada satu konten
-        $table->unique(['content_id', 'language_id']);
     });
 }
-    /**
+
+/**
      * Reverse the migrations.
      */
     public function down(): void

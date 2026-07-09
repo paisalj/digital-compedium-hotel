@@ -96,7 +96,7 @@ class GeminiProvider implements TranslationProvider
             );
         }
 
-        // 4. Lakukan looping mencari kunci yang valid dan sukses merespons
+// 4. Lakukan looping mencari kunci yang valid dan sukses merespons
         foreach ($keyQueue as $index => $keyData) {
             $activeKey = $keyData['key'];
 
@@ -108,53 +108,34 @@ class GeminiProvider implements TranslationProvider
                 ]);
 
                 $response = Http::withoutVerifying()
-                    ->retry(2, 500) // Pengaturan retry dipercepat agar perpindahan key gesit
-                    ->timeout(30)
+                    ->retry(2, 500)
+                    ->timeout(10) // Timeout lebih cepat agar rotasi instan
                     ->acceptJson()
                     ->contentType('application/json')
                     ->post(
                         "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$activeKey}",
-                        [
-                            'contents' => [
-                                [
-                                    'parts' => [
-                                        [
-                                            'text' => $text
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
+                        ['contents' => [['parts' => [['text' => $text]]]]]
                     );
 
-                // Jika respons gagal (HTTP 429 / HTTP 403 / HTTP 401 dll)
+                // LOGIKA ROTASI: Jika gagal, langsung tandai dan lanjut ke key berikutnya
                 if (! $response->successful()) {
-                    Log::error("AI Key Manager: Kunci Ke-" . ($index + 1) . " Gagal dengan HTTP Status: " . $response->status(), [
-                        'body' => $response->body(),
-                    ]);
+                    Log::error("AI Key Manager: Kunci Ke-" . ($index + 1) . " Gagal (Status: " . $response->status() . ")");
 
-                    // Jika bersumber dari DB, kunci token ini dan beri hukuman cooldown 15 menit
                     if ($keyData['source'] === 'db' && $keyData['model']) {
                         $keyData['model']->update([
                             'status' => 'quota_exceeded',
                             'reset_quota_at' => now()->addMinutes(15)
                         ]);
                     }
-
-                    // LOMPAT DAN LANJUTKAN LOOPING KE KUNCI CADANGAN BERIKUTNYA
-                    continue;
+                    continue; // PENTING: Ini yang membuat rotasi berjalan ke kunci berikutnya
                 }
 
-                // JIKA BERHASIL: Catat waktu pemakaian terakhir jika token berasal dari DB
+                // Jika Berhasil: Catat penggunaan dan kembalikan hasil
                 if ($keyData['source'] === 'db' && $keyData['model']) {
-                    $keyData['model']->update([
-                        'last_used_at' => now()
-                    ]);
+                    $keyData['model']->update(['last_used_at' => now()]);
                 }
 
-                $translated = trim(
-                    $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? ''
-                );
+                $translated = trim($response->json()['candidates'][0]['content']['parts'][0]['text'] ?? '');
 
                 return new TranslationResult(
                     success: true,
@@ -166,23 +147,18 @@ class GeminiProvider implements TranslationProvider
                 );
 
             } catch (Throwable $e) {
-                Log::error("AI Key Manager: Kunci Ke-" . ($index + 1) . " Mengalami Exception / Gangguan", [
-                    'message' => $e->getMessage(),
-                ]);
-
-                // Jika terjadi putus koneksi/gangguan pada key DB, amankan dengan mengubah statusnya
+                Log::error("AI Key Manager: Kunci Ke-" . ($index + 1) . " Exception", ['message' => $e->getMessage()]);
+                
+                // Amankan key jika error koneksi
                 if ($keyData['source'] === 'db' && $keyData['model']) {
                     $keyData['model']->update([
                         'status' => 'quota_exceeded',
                         'reset_quota_at' => now()->addMinutes(15)
                     ]);
                 }
-
-                // LOMPAT KE KUNCI CADANGAN BERIKUTNYA
-                continue;
+                continue; // Lanjut ke key berikutnya
             }
         }
-
         // 5. Jika SEMUA kunci di antrean sudah habis dicoba dan gagal total
         return new TranslationResult(
             success: false,

@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ContentTranslation extends Model
+class CategoryTranslation extends Model // 👈 Selesai diperbaiki namanya ke Kategori
 {
     use HasFactory;
 
-    protected $fillable = ['content_id', 'language_id', 'title', 'body', 'slug'];
+    protected $fillable = ['category_id', 'language_id', 'name', 'slug']; // 👈 Sesuai kolom kategori Anda
 
-    // Relasi balik ke data induk Konten
-    public function content()
+    // Relasi balik ke data induk Kategori
+    public function category()
     {
-        return $this->belongsTo(Content::class);
+        return $this->belongsTo(Category::class);
     }
 
     // Relasi ke data Bahasa yang digunakan

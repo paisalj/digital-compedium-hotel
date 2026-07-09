@@ -34,8 +34,8 @@ class Category extends Model
     /**
      * Semua terjemahan kategori.
      */
-    public function translations(): HasMany
-    {
-        return $this->hasMany(CategoryTranslation::class);
-    }
+public function translations()
+{
+    return $this->hasMany(\App\Models\CategoryTranslation::class);
+}
 }

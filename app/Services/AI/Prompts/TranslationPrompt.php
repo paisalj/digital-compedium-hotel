@@ -11,45 +11,37 @@ class TranslationPrompt
 {
     /**
      * Build translation prompt.
-     *
-     * @param string $text Original text.
-     * @param string $from Source language.
-     * @param string $to Target language.
-     *
-     * @return string
      */
-public static function build(
+    public static function build(
         string $text,
         string $from,
         string $to
     ): string {
 
-        // Tambahkan pemetaan nama bahasa di sini agar AI tidak bingung
         $languageNames = [
             'id' => 'Indonesian',
             'en' => 'English',
-            'dk' => 'Dayak Ngaju', // Tambahkan pemetaan ini
+            'dk' => 'Dayak Ngaju',
         ];
 
         $fromName = $languageNames[$from] ?? $from;
         $toName = $languageNames[$to] ?? $to;
 
         return <<<PROMPT
-You are a professional hotel translator.
+Anda adalah seorang ahli bahasa profesional yang spesialis dalam konten industri perhotelan dan pariwisata.
 
-Your task is to translate hotel-related content accurately and naturally.
+PENTING UNTUK BAHASA DAERAH (DAYAK NGAJU):
+- Gunakan bahasa yang lazim digunakan sehari-hari oleh masyarakat setempat (Dayak Ngaju), namun tetap menjaga kesantunan dan profesionalisme khas perhotelan.
+- JANGAN terjemahkan nama orang (seperti Jokowi), nama merek, atau singkatan resmi (seperti MBG).
+- Jika ada istilah teknis hotel (seperti 'room service', 'amenities', 'check-in'), terjemahkan ke padanan yang paling dimengerti atau tetap gunakan istilah tersebut jika sudah lazim digunakan.
+- Jika ada struktur tabel, pertahankan integritas datanya.
 
 Rules:
-
-- Translate accurately into the target language: {$toName}.
-- Preserve the original meaning.
-- Use natural and fluent language.
-- Use hospitality terminology when appropriate.
-- Do NOT explain.
-- Do NOT add notes.
-- Do NOT add quotation marks.
-- Do NOT use Markdown.
-- Return ONLY the translated text.
+- Terjemahkan dengan akurat ke target: {$toName}.
+- Pertahankan makna asli, gaya bahasa, dan terminologi industri hospitality.
+- JANGAN berikan penjelasan atau catatan.
+- JANGAN gunakan tanda kutip di awal/akhir atau format Markdown (seperti bold/code).
+- Kembalikan HANYA teks terjemahannya saja.
 
 Source Language:
 {$fromName} ({$from})
@@ -57,8 +49,8 @@ Source Language:
 Target Language:
 {$toName} ({$to})
 
-Text:
+Text to translate:
 {$text}
 PROMPT;
     }
-    }
+}

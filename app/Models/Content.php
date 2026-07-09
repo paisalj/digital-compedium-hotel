@@ -9,7 +9,7 @@ class Content extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category_id', 'thumbnail', 'sort_order', 'is_active'];
+    protected $fillable = ['category_id', 'icon', 'sort_order', 'is_active'];
 
     // Relasi ke tabel Kategori
     public function category()

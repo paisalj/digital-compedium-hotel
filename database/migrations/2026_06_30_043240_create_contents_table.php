@@ -9,13 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
+public function up()
 {
     Schema::create('contents', function (Blueprint $table) {
         $table->id();
-        // Menghubungkan konten ke tabel categories yang sudah Anda buat
-        $table->foreignId('category_id')->constrained()->onDelete('cascade');
-        $table->string('thumbnail')->nullable(); // Untuk foto utama artikel/portofolio
+        $table->unsignedBigInteger('category_id'); // Pastikan ini ada
+        $table->string('thumbnail')->nullable();
         $table->integer('sort_order')->default(0);
         $table->boolean('is_active')->default(true);
         $table->timestamps();

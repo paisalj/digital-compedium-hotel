@@ -9,17 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
-{
-    Schema::table('categories', function (Blueprint $table) {
-        $table->text('description')->nullable()->after('thumbnail');
-    });
-}
+    public function up(): void
+    {
+        Schema::table('categories', function (Blueprint $table) {
+            // Kita hapus ->after('thumbnail') agar tidak error mencari kolom foto
+            $table->text('description')->nullable();
+        });
+    }
 
-public function down(): void
-{
-    Schema::table('categories', function (Blueprint $table) {
-        $table->dropColumn('description');
-    });
-}
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('categories', function (Blueprint $table) {
+            $table->dropColumn('description');
+        });
+    }
 };

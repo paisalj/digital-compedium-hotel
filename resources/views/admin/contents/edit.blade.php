@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Tambah Konten')
+@section('title', 'Edit Konten')
 
-@section('page-title', 'Tambah Konten')
+@section('page-title', 'Edit Konten')
 
 @section('content')
 
@@ -63,25 +63,27 @@
 <div class="bg-white rounded-2xl shadow-md">
 
 <div class="border-b p-6 flex justify-between items-center">
-    {{-- Sisi Kiri: Judul dan Deskripsi Halaman Tambah --}}
+    {{-- Sisi Kiri: Judul dan Deskripsi Tetap Menyatu Kebawah --}}
     <div>
         <h2 class="text-2xl font-bold text-gray-800">
-            Tambah Konten Portofolio
+            Edit Konten Portofolio
         </h2>
         <p class="text-gray-500 mt-1">
-            Tambahkan konten panduan informasi baru beserta seluruh terjemahannya.
+            Ubah konten panduan informasi beserta seluruh terjemahannya.
         </p>
     </div>
 
-    {{-- Sisi Kanan: Tombol Kembali --}}
+    {{-- Sisi Kanan: Tombol Kembali yang Clean & Profesional --}}
     <a href="{{ route('admin.contents.index') }}" 
        class="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl transition shadow-sm text-sm font-medium">
         <i class="bi bi-arrow-left text-base"></i>
         <span>Kembali</span>
     </a>
 </div>
-    <form action="{{ route('admin.contents.store') }}" method="POST" enctype="multipart/form-data">
+    {{-- PERBAIKAN: Mengubah rute form ke rute update menggunakan ID dari variabel $content --}}
+    <form action="{{ route('admin.contents.update', $content->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT') {{-- WAJIB: Ditambahkan agar Laravel mengenali pengiriman form ini sebagai metode spoofing PUT --}}
 
         @if ($errors->any() || session('error'))
             <div class="bg-red-100 border border-red-400 text-red-700 p-4 rounded-xl mx-6 mt-6">
@@ -101,38 +103,37 @@
 
         <div class="p-6 space-y-8">
 
-            {{-- DATA UTAMA KONTEN --}}
-            <div>
-                <h3 class="text-xl font-bold mb-5">📂 Data Utama Konten</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    
-                    {{-- Pilihan Kategori --}}
-                    <div class="relative">
-                        <label class="block mb-2 font-medium text-gray-700">Kategori Konten</label>
-                        <div class="flex items-center gap-3">
-                            {{-- Tag select dengan id="category-select" yang akan dipanggil oleh JS Choices --}}
-                            <div class="w-full">
-                                <select name="category_id" id="category-select" class="w-full border rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm" required>
-                                    <option value="">-- Pilih Kategori --</option>
-                                    @foreach($categories as $category)
-                                        @php
-                                            $catName = $category->translations->where('language.code', app()->getLocale())->first()->name ?? $category->translations->first()->name;
-                                        @endphp
-                                        <option value="{{ $category->id }}" data-icon="{{ $category->icon }}">
-                                            {{ $catName }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            {{-- Container Ikon Emas yang muncul otomatis --}}
-                            <div id="icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
-                                <i id="icon-display" class="bi"></i>
-                            </div>
-                        </div>
-                    </div>
+{{-- DATA UTAMA KONTEN --}}
+<div>
+    <h3 class="text-xl font-bold mb-5">📂 Data Utama Konten</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        {{-- Pilihan Kategori (Sudah Sempurna) --}}
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Kategori Konten</label>
+            <div class="flex items-center gap-3">
+                <div class="w-full">
+                    <select name="category_id" id="category-select" class="w-full border rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        @foreach($categories as $category)
+                            @php
+                                $catName = $category->translations->where('language.code', app()->getLocale())->first()->name ?? $category->translations->first()->name;
+                            @endphp
+                            <option value="{{ $category->id }}" data-icon="{{ $category->icon }}" {{ $content->category_id == $category->id ? 'selected' : '' }}>
+                                {{ $catName }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                {{-- Container Ikon Emas Kategori --}}
+                <div id="icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
+                    <i id="icon-display" class="bi"></i>
+                </div>
+            </div>
+        </div>
 
-                    {{-- Input Ikon Konten --}}
+        {{-- PERBAIKAN: Input Ikon Konten + Live Preview Mandiri --}}
 <div>
     <label class="block mb-2 font-medium text-gray-700">Ikon Konten</label>
     <div class="flex items-center gap-3">
@@ -140,21 +141,22 @@
             <input
                 type="text"
                 name="icon"
-                id="content-icon-input"
-                value="{{ old('icon') }}" {{-- Untuk halaman create, cukup old('icon') saja --}}
+                id="content-icon-input" 
+                value="{{ old('icon', $content->icon) }}"
                 class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
-                placeholder="Contoh: bi-wifi, bi-door-closed, bi-info-circle">
+                placeholder="Contoh: bi-wifi">
         </div>
         
-        {{-- Wadah untuk memunculkan ikon emas saat diketik --}}
+        {{-- Wadah untuk memunculkan ikon emas lama dari database secara otomatis --}}
         <div id="content-icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
             <i id="content-icon-display" class="bi"></i>
         </div>
     </div>
     <small class="text-gray-400 mt-1 block">Gunakan nama class dari Bootstrap Icons (diawali dengan bi-).</small>
 </div>
-                </div>
-            </div>
+
+</div>
+</div>
 
             {{-- TRANSLATION SECTIONS --}}
             <hr class="border-gray-100">
@@ -171,6 +173,10 @@
                 </div>
 
                 @foreach($languages as $language)
+                    @php
+                        // PERBAIKAN: Mengambil data terjemahan lama yang spesifik sesuai dengan ID bahasa perulangan
+                        $transData = $content->translations->where('language_id', $language->id)->first();
+                    @endphp
                     <div class="border rounded-xl p-6 mb-6 bg-gray-50">
                         <h4 class="text-lg font-bold mb-5 flex items-center gap-2">
                             <span>{{ $language->flag ?? '🌐' }}</span> 
@@ -184,6 +190,8 @@
                                     type="text"
                                     name="translations[{{ $language->id }}][title]"
                                     data-language="{{ $language->code }}"
+                                    {{-- PERBAIKAN: Memasukkan nilai judul lama ke inputan --}}
+                                    value="{{ old('translations.'.$language->id.'.title', $transData->title ?? '') }}"
                                     class="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
                                     placeholder="Masukkan judul konten..."
                                     required>
@@ -195,6 +203,8 @@
                                     type="text"
                                     name="translations[{{ $language->id }}][slug]"
                                     data-slug="{{ $language->code }}"
+                                    {{-- PERBAIKAN: Memasukkan nilai slug lama ke inputan --}}
+                                    value="{{ old('translations.'.$language->id.'.slug', $transData->slug ?? '') }}"
                                     class="w-full border rounded-xl px-4 py-3 bg-gray-200 text-gray-500 cursor-not-allowed shadow-sm"
                                     placeholder="slug-otomatis-terisi"
                                     readonly>
@@ -204,12 +214,11 @@
                         <div class="mb-2">
                             <label class="block mb-2 font-medium">Isi / Deskripsi Konten (Bisa Masukkan Gambar & Tabel)</label>
                             <div class="editor-container bg-white rounded-xl overflow-hidden border shadow-sm">
-                                {{-- PERBAIKAN: Ditambahkan id unik "body_{{ $language->id }}" agar TinyMCE dapat diakses JS --}}
                                 <textarea 
                                     class="tinymce-editor" 
                                     id="body_{{ $language->id }}"
                                     name="translations[{{ $language->id }}][body]" 
-                                    rows="10">{{ old('translations.'.$language->id.'.body') }}</textarea>
+                                    rows="10">{{ old('translations.'.$language->id.'.body', $transData->body ?? '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -220,7 +229,7 @@
 
         <div class="border-t p-6 flex justify-end gap-3 bg-gray-50 rounded-b-2xl">
             <a href="{{ route('admin.contents.index') }}" class="px-5 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition font-medium">Batal</a>
-            <button type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Simpan Konten</button>
+            <button type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Update Konten</button>
         </div>
     </form>
 
@@ -236,10 +245,44 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // === 1. VARIABEL UNTUK KATEGORI (BAWAAN) ===
     const categorySelect = document.getElementById('category-select');
     const iconPreview = document.getElementById('icon-preview');
     const iconDisplay = document.getElementById('icon-display');
 
+    // === 2. VARIABEL BARU UNTUK IKON KONTEN (TAMBAHAN) ===
+    const contentIconInput = document.getElementById('content-icon-input');
+    const contentIconPreview = document.getElementById('content-icon-preview');
+    const contentIconDisplay = document.getElementById('content-icon-display');
+
+
+    // === 3. FUNGSI PREVIEW IKON KATEGORI (BAWAAN) ===
+    function updateIconPreview() {
+        if (!categorySelect) return;
+        const selectedValue = categorySelect.value;
+        const selectedOption = categorySelect.querySelector(`option[value="${selectedValue}"]`);
+        const iconClass = selectedOption ? selectedOption.getAttribute('data-icon') : null;
+
+        if (iconClass && iconPreview && iconDisplay) {
+            iconPreview.classList.remove('hidden');
+            iconDisplay.className = 'bi ' + iconClass; 
+        } else if (iconPreview) {
+            iconPreview.classList.add('hidden');
+        }
+    }
+
+    // === 4. FUNGSI BARU PREVIEW IKON KONTEN (TAMBAHAN) ===
+    function updateContentIconPreview() {
+        if (!contentIconInput) return;
+        const iconValue = contentIconInput.value.trim();
+
+        if (iconValue) {
+            contentIconPreview.classList.remove('hidden');
+            contentIconDisplay.className = 'bi ' + iconValue.replace('bi ', ''); 
+        } else {
+            contentIconPreview.classList.add('hidden');
+        }
+    }
     if (categorySelect) {
         // 1. MENGUBAH SELECT BIASA MENJADI CHOICES.JS (DROPDOWN PENDEK YANG BISA DI-SCROLL)
         const choicesInstance = new Choices(categorySelect, {
@@ -249,28 +292,22 @@ document.addEventListener('DOMContentLoaded', function() {
             shouldSort: false,
         });
 
-        // 2. MENGATUR MUNCULNYA IKON EMAS SAAT KATEGORI DIPILIH
-        categorySelect.addEventListener('change', function() {
-            const selectedValue = this.value;
-            const selectedOption = categorySelect.querySelector(`option[value="${selectedValue}"]`);
-            const iconClass = selectedOption ? selectedOption.getAttribute('data-icon') : null;
-
-            if (iconClass && iconPreview && iconDisplay) {
-                iconPreview.classList.remove('hidden');
-                iconDisplay.className = 'bi ' + iconClass; 
-            } else if (iconPreview) {
-                iconPreview.classList.add('hidden');
-            }
-        });
+        // 2. MENGATUR MUNCULNYA IKON EMAS SAAT KATEGORI DIPILIH / BERUBAH
+        categorySelect.addEventListener('change', updateIconPreview);
+        
+        // JALANKAN OTOMATIS SAAT EDIT DI-LOAD: Agar data lama terdeteksi dan ikon emasnya langsung nangkring rapi
+        updateIconPreview();
     }
 
-const form = document.querySelector('form[action="{{ route("admin.contents.store") }}"]');
+    // PERBAIKAN: Menyesuaikan selektor form pencarian ke arah rute update konten
+    const form = document.querySelector('form[action="{{ route("admin.contents.update", $content->id) }}"]');
     if (form) {
         form.addEventListener('submit', function() {
             // Ini memaksa TinyMCE untuk menyalin konten ke textarea sebelum dikirim
             tinymce.triggerSave();
         });
     }
+
     // Inisialisasi TinyMCE Editor
     tinymce.init({
         selector: '.tinymce-editor',
@@ -332,7 +369,6 @@ const form = document.querySelector('form[action="{{ route("admin.contents.store
         btnTranslate.addEventListener('click', async function () {
             const indoTitleInput = document.querySelector('[data-language="id"]');
             
-            // PERBAIKAN: Menemukan ID bahasa dinamis dari element input Indonesia secara presisi
             let indoLangId = '1';
             if (indoTitleInput) {
                 const nameAttr = indoTitleInput.getAttribute('name');
@@ -340,7 +376,6 @@ const form = document.querySelector('form[action="{{ route("admin.contents.store
                 if (match) indoLangId = match[1];
             }
             
-            // Mengambil konten HTML dari TinyMCE Indonesia menggunakan ID yang tepat
             let indoBodyContent = '';
             const activeIndoEditor = tinymce.get('body_' + indoLangId);
             if (activeIndoEditor) {
@@ -405,7 +440,6 @@ const form = document.querySelector('form[action="{{ route("admin.contents.store
                         const titleInput = document.querySelector(`[name="translations[${langId}][title]"]`);
                         const slugInput = document.querySelector(`[name="translations[${langId}][slug]"]`);
 
-                        // Isi Judul & Slug
                         if (titleInput) {
                             const translatedTitle = result.translations[langId].title || result.translations[langId].name;
                             if (translatedTitle) {
@@ -420,7 +454,6 @@ const form = document.querySelector('form[action="{{ route("admin.contents.store
                             }
                         }
 
-                        // PERBAIKAN: Mengisi deskripsi ke TinyMCE menggunakan ID terarah (body_ID)
                         const translatedBody = result.translations[langId].body || '';
                         const editorInstance = tinymce.get('body_' + langId);
                         
