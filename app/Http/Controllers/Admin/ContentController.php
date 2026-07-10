@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
+
 class ContentController extends Controller
 {
     protected TranslationService $translator;
@@ -23,28 +24,49 @@ class ContentController extends Controller
         $this->translator = $translator;
     }
 
-public function index()
-{
-    // Ubah bagian ini agar menggunakan paginate() bukan get() atau all()
-    $contents = Content::query()
-        ->with('translations.language') // Sesuaikan dengan relasi jika ada
-        ->latest()
-        ->paginate(10); // <--- Kuncinya ada di sini
 
-    return view('admin.contents.index', compact('contents'));
+public function index(Request $request)
+{
+    $categories = Category::with('translations')->get();
+    
+// 1. Cek Apakah Baris Ini Sudah Ada? (Untuk mengambil data bahasa)
+    $languages = \App\Models\Language::all();
+
+
+    $selectedCategory = $request->get('category_id');
+    $search = $request->get('search');
+
+    $contents = Content::query()
+        ->with(['translations.language', 'category.translations'])
+        ->when($selectedCategory, function ($query) use ($selectedCategory) {
+            return $query->where('category_id', $selectedCategory);
+        })
+        ->when($search, function ($query) use ($search) {
+            return $query->whereHas('translations', function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%');
+            });
+        })
+        ->orderBy('sort_order', 'asc') 
+        ->paginate(10)
+        ->withQueryString(); 
+
+    // 👈 TAMBAHKAN 'languages' ke dalam compact()
+    return view('admin.contents.index', compact('contents', 'categories', 'selectedCategory', 'languages'));
 }
 
-    public function create()
+public function create()
     {
         $categories = Category::with('translations')->get();
         $languages = Language::where('is_active', true)->get();
+
 
         return view('admin.contents.create', compact('categories', 'languages'));
     }
 
 public function store(Request $request)
 {
-    // 1. Validasi lebih ketat
+
+    // 1. Validasi
     $request->validate([
         'category_id' => 'required|exists:categories,id',
         'icon' => 'nullable|string',
@@ -52,8 +74,6 @@ public function store(Request $request)
     ]);
 
     try {
-        // 2. Gunakan DB Transaction agar jika gagal di tengah jalan, 
-        // data tidak tersimpan setengah-setengah di database
         return \DB::transaction(function () use ($request) {
             
             $thumbnailPath = null;
@@ -61,40 +81,39 @@ public function store(Request $request)
                 $thumbnailPath = $request->file('thumbnail')->store('contents/thumbnails', 'public');
             }
 
+            // HITUNG URUTAN: Ambil max dari kategori terkait saja
+            $nextOrder = (\App\Models\Content::where('category_id', $request->category_id)->max('sort_order') ?? 0) + 1;
+            
+            // SIMPAN KE CONTENT
             $content = Content::create([
                 'category_id' => $request->category_id,
-                'icon'        => $request->icon, // <-- TAMBAHKAN BARIS INI
-                'sort_order' => $request->sort_order ?? 0,
-                'is_active' => $request->is_active ?? true,
+                'icon'        => $request->icon,
+                'sort_order'  => $nextOrder, // ✨ GUNAKAN $nextOrder di sini
+                'is_active'   => $request->is_active ?? true,
             ]);
 
+            // SIMPAN TRANSLATION
             foreach ($request->translations as $langId => $translationData) {
-                // Pastikan title tidak kosong sebelum mencoba simpan
                 if (!empty($translationData['title'])) {
                     ContentTranslation::create([
                         'content_id'  => $content->id,
                         'language_id' => $langId,
                         'title'       => $translationData['title'],
-                        // Penting: Pastikan body terambil dari textarea (hasil tinymce.triggerSave)
                         'body'        => $translationData['body'] ?? '',
-                        'slug'        => Str::slug($translationData['title']),
+                        'slug'        => \Str::slug($translationData['title']),
                     ]);
                 }
             }
 
             return redirect()->route('admin.contents.index')
-                             ->with('success', 'Konten portofolio berhasil disimpan!');
+                             ->with('success', 'Konten berhasil disimpan!');
         });
 
     } catch (\Exception $e) {
-        // 3. Log error ke storage/logs/laravel.log agar kita tahu masalahnya
         \Log::error("Gagal simpan konten: " . $e->getMessage());
-        
-        // Kembalikan ke halaman sebelumnya dengan pesan error
         return back()->withInput()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
     }
 }
-
 public function edit(string $id)
     {
         $content = Content::findOrFail($id);
@@ -125,7 +144,7 @@ public function edit(string $id)
 
         $content->category_id = $request->category_id;
         $content->icon = $request->icon;
-        $content->sort_order = $request->sort_order ?? 0;
+        $content->sort_order = $request->sort_order ?? $content->sort_order;
         $content->is_active = $request->is_active ?? true;
         $content->save();
 
@@ -143,21 +162,29 @@ public function edit(string $id)
         }
 
         return redirect()->route('admin.contents.index')
-                         ->with('success', 'Konten portofolio berhasil diperbarui!');
+                         ->with('success', 'Konten berhasil diperbarui!');
     }
 
-    public function destroy(string $id)
-    {
-        $content = Content::findOrFail($id);
-        if ($content->thumbnail) {
-            Storage::disk('public')->delete($content->thumbnail);
-        }
-        $content->delete();
+public function destroy($id)
+{
+    $content = Content::findOrFail($id);
+    $deletedOrder = $content->sort_order; // Simpan urutan item yang dihapus
+    
+    // 1. Hapus kontennya
+    $content->delete();
 
-        return redirect()->route('admin.contents.index')
-                         ->with('success', 'Konten portofolio berhasil dihapus!');
+    // 2. TATA ULANG (Reorder):
+    // Cari semua konten yang urutannya lebih besar dari item yang dihapus
+    $remainingContents = Content::where('sort_order', '>', $deletedOrder)->get();
+
+    foreach ($remainingContents as $item) {
+        // Kurangi angka urutannya sebanyak 1
+        $item->sort_order = $item->sort_order - 1;
+        $item->save();
     }
 
+    return redirect()->route('admin.contents.index')->with('success', 'Konten dihapus dan urutan diperbarui!');
+}
 public function translate(Request $request)
 {
     $request->validate([
@@ -206,7 +233,7 @@ public function translate(Request $request)
             }
 
             $translations[$lang->id] = [
-                'title' => $decoded['title'] ?? 'Hasil gagal',
+                'title' => $decoded['title'] ?? 'Token habis, pakai menual dulu',
                 'body'  => $translatedBody
             ];
         }
@@ -224,4 +251,63 @@ public function translate(Request $request)
         ], 500);
     }
 }
+public function updateOrder(Request $request)
+{
+    // 1. Validasi data yang masuk wajib berupa array isi angka
+    $request->validate([
+        'sort_order' => 'required|array',
+        'sort_order.*' => 'required|integer|min:0',
+    ]);
+
+    // 2. Lakukan looping untuk mengupdate urutan setiap konten berdasarkan ID
+    foreach ($request->sort_order as $id => $order) {
+        Content::where('id', $id)->update([
+            'sort_order' => $order
+        ]);
+    }
+
+    // 3. Kembalikan ke halaman index dengan pesan sukses
+    return redirect()->route('admin.contents.index')->with('success', 'Susunan urutan konten berhasil diperbarui!');
+}
+
+public function trash()
+{
+    // Mengambil data konten yang berstatus soft-deleted
+    $contents = Content::onlyTrashed()->get();
+    
+    return view('admin.contents.trash', compact('contents'));
+}
+public function restore($id)
+{
+    // 1. Cari konten yang ada di trash
+    $content = Content::onlyTrashed()->findOrFail($id);
+
+    // 2. Cari angka urutan terbesar di tabel index saat ini
+    $maxOrder = Content::max('sort_order');
+
+    // 3. Berikan urutan baru agar dia berada di posisi paling bawah
+    $content->sort_order = $maxOrder + 1;
+    
+    // ✨ TAMBAHAN: Otomatis ubah status menjadi Nonaktif (0)
+    // (Silakan sesuaikan nama 'is_active' dengan nama kolom status di database Anda jika berbeda)
+    $content->is_active = 0; 
+    
+    // 4. Restore kontennya
+    $content->restore();
+    $content->save();
+
+    return redirect()->route('admin.contents.trash')->with('success', 'Konten berhasil dikembalikan ke posisi terakhir dengan status Nonaktif!');
+}
+public function forceDelete($id)
+{
+    $content = Content::onlyTrashed()->findOrFail($id);
+    
+    // Hapus juga data translasinya jika ada relasi cascade / manual cascading
+    $content->translations()->delete(); 
+    
+    $content->forceDelete(); // Hapus permanen dari DB
+
+    return redirect()->route('admin.contents.trash')->with('success', 'Konten telah dihapus permanen!');
+}
+
 }

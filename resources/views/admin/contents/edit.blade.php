@@ -66,19 +66,16 @@
     {{-- Sisi Kiri: Judul dan Deskripsi Tetap Menyatu Kebawah --}}
     <div>
         <h2 class="text-2xl font-bold text-gray-800">
-            Edit Konten Portofolio
+            Edit Konten
         </h2>
         <p class="text-gray-500 mt-1">
-            Ubah konten panduan informasi beserta seluruh terjemahannya.
+            Ubah konten beserta seluruh terjemahannya.
         </p>
     </div>
 
-    {{-- Sisi Kanan: Tombol Kembali yang Clean & Profesional --}}
-    <a href="{{ route('admin.contents.index') }}" 
-       class="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl transition shadow-sm text-sm font-medium">
-        <i class="bi bi-arrow-left text-base"></i>
-        <span>Kembali</span>
-    </a>
+        <a href="{{ route('admin.contents.index') }}" class="px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
 </div>
     {{-- PERBAIKAN: Mengubah rute form ke rute update menggunakan ID dari variabel $content --}}
     <form action="{{ route('admin.contents.update', $content->id) }}" method="POST" enctype="multipart/form-data">
@@ -106,7 +103,7 @@
 {{-- DATA UTAMA KONTEN --}}
 <div>
     <h3 class="text-xl font-bold mb-5">📂 Data Utama Konten</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
         
         {{-- Pilihan Kategori (Sudah Sempurna) --}}
         <div>
@@ -133,44 +130,54 @@
             </div>
         </div>
 
-        {{-- PERBAIKAN: Input Ikon Konten + Live Preview Mandiri --}}
-<div>
-    <label class="block mb-2 font-medium text-gray-700">Ikon Konten</label>
-    <div class="flex items-center gap-3">
-        <div class="w-full">
-            <input
-                type="text"
-                name="icon"
-                id="content-icon-input" 
-                value="{{ old('icon', $content->icon) }}"
-                class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
-                placeholder="Contoh: bi-wifi">
+        {{-- Input Ikon Konten --}}
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Ikon Konten</label>
+            <div class="flex items-center gap-3">
+                <div class="w-full">
+                    <input
+                        type="text"
+                        name="icon"
+                        id="content-icon-input" 
+                        value="{{ old('icon', $content->icon) }}"
+                        class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                        placeholder="Contoh: bi-wifi">
+                </div>
+                
+                {{-- Wadah untuk memunculkan ikon emas lama dari database secara otomatis --}}
+                <div id="content-icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
+                    <i id="content-icon-display" class="bi"></i>
+                </div>
+            </div>
         </div>
-        
-        {{-- Wadah untuk memunculkan ikon emas lama dari database secara otomatis --}}
-        <div id="content-icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
-            <i id="content-icon-display" class="bi"></i>
+
+        {{-- Status Konten --}}
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Status Konten</label>
+            <select name="is_active" class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm">
+                <option value="1" @selected($content->is_active == 1)>Aktif</option>
+                <option value="0" @selected($content->is_active == 0)>Tidak Aktif</option>
+            </select>
         </div>
+
     </div>
-    <small class="text-gray-400 mt-1 block">Gunakan nama class dari Bootstrap Icons (diawali dengan bi-).</small>
 </div>
-
-</div>
-</div>
-
             {{-- TRANSLATION SECTIONS --}}
             <hr class="border-gray-100">
 
             <div>
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold">🌐 Terjemahan Konten</h3>
+
                     <button
                         type="button"
                         id="translate-ai"
                         class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition font-medium shadow-sm">
                         <i class="bi bi-stars"></i> Terjemahkan AI
                     </button>
+
                 </div>
+                    <small class="text-gray-400 mt-1 block">Apa bila token habis bisa edit manual.</small>
 
                 @foreach($languages as $language)
                     @php
@@ -185,7 +192,7 @@
 
                         <div class="grid md:grid-cols-2 gap-5 mb-4">
                             <div>
-                                <label class="block mb-2 font-medium">Judul Konten</label>
+                                <label class="block mb-2 font-medium">Judul</label>
                                 <input
                                     type="text"
                                     name="translations[{{ $language->id }}][title]"
@@ -212,7 +219,7 @@
                         </div>
 
                         <div class="mb-2">
-                            <label class="block mb-2 font-medium">Isi / Deskripsi Konten (Bisa Masukkan Gambar & Tabel)</label>
+                            <label class="block mb-2 font-medium">Deskripsi</label>
                             <div class="editor-container bg-white rounded-xl overflow-hidden border shadow-sm">
                                 <textarea 
                                     class="tinymce-editor" 

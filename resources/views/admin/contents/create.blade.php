@@ -66,19 +66,25 @@
     {{-- Sisi Kiri: Judul dan Deskripsi Halaman Tambah --}}
     <div>
         <h2 class="text-2xl font-bold text-gray-800">
-            Tambah Konten Portofolio
+            Tambah Konten
         </h2>
         <p class="text-gray-500 mt-1">
-            Tambahkan konten panduan informasi baru beserta seluruh terjemahannya.
+            Tambahkan konten baru beserta seluruh terjemahannya.
         </p>
     </div>
 
-    {{-- Sisi Kanan: Tombol Kembali --}}
-    <a href="{{ route('admin.contents.index') }}" 
-       class="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl transition shadow-sm text-sm font-medium">
-        <i class="bi bi-arrow-left text-base"></i>
-        <span>Kembali</span>
-    </a>
+        <a href="{{ route('admin.contents.index') }}" class="px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+@if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 </div>
     <form action="{{ route('admin.contents.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -101,61 +107,66 @@
 
         <div class="p-6 space-y-8">
 
-            {{-- DATA UTAMA KONTEN --}}
-            <div>
-                <h3 class="text-xl font-bold mb-5">📂 Data Utama Konten</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    
-                    {{-- Pilihan Kategori --}}
-                    <div class="relative">
-                        <label class="block mb-2 font-medium text-gray-700">Kategori Konten</label>
-                        <div class="flex items-center gap-3">
-                            {{-- Tag select dengan id="category-select" yang akan dipanggil oleh JS Choices --}}
-                            <div class="w-full">
-                                <select name="category_id" id="category-select" class="w-full border rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm" required>
-                                    <option value="">-- Pilih Kategori --</option>
-                                    @foreach($categories as $category)
-                                        @php
-                                            $catName = $category->translations->where('language.code', app()->getLocale())->first()->name ?? $category->translations->first()->name;
-                                        @endphp
-                                        <option value="{{ $category->id }}" data-icon="{{ $category->icon }}">
-                                            {{ $catName }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            {{-- Container Ikon Emas yang muncul otomatis --}}
-                            <div id="icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
-                                <i id="icon-display" class="bi"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Input Ikon Konten --}}
+{{-- DATA UTAMA KONTEN --}}
 <div>
-    <label class="block mb-2 font-medium text-gray-700">Ikon Konten</label>
-    <div class="flex items-center gap-3">
-        <div class="w-full">
-            <input
-                type="text"
-                name="icon"
-                id="content-icon-input"
-                value="{{ old('icon') }}" {{-- Untuk halaman create, cukup old('icon') saja --}}
-                class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
-                placeholder="Contoh: bi-wifi, bi-door-closed, bi-info-circle">
-        </div>
+    <h3 class="text-xl font-bold mb-5">📂 Data Utama Konten</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
         
-        {{-- Wadah untuk memunculkan ikon emas saat diketik --}}
-        <div id="content-icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
-            <i id="content-icon-display" class="bi"></i>
-        </div>
-    </div>
-    <small class="text-gray-400 mt-1 block">Gunakan nama class dari Bootstrap Icons (diawali dengan bi-).</small>
-</div>
+        {{-- Pilihan Kategori --}}
+        <div class="relative">
+            <label class="block mb-2 font-medium text-gray-700">Kategori Konten</label>
+            <div class="flex items-center gap-3">
+                <div class="w-full">
+                    <select name="category_id" id="category-select" class="w-full border rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        @foreach($categories as $category)
+                            @php
+                                $catName = $category->translations->where('language.code', app()->getLocale())->first()->name ?? $category->translations->first()->name;
+                            @endphp
+                            <option value="{{ $category->id }}" data-icon="{{ $category->icon }}">
+                                {{ $catName }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div id="icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
+                    <i id="icon-display" class="bi"></i>
                 </div>
             </div>
+        </div>
 
+        {{-- Input Ikon Konten --}}
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Ikon Konten</label>
+            <div class="flex items-center gap-3">
+                <div class="w-full">
+                    <input
+                        type="text"
+                        name="icon"
+                        id="content-icon-input"
+                        value="{{ old('icon') }}"
+                        class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                        placeholder="Contoh: bi-wifi, bi-door-closed, bi-info-circle">
+                </div>
+                
+                <div id="content-icon-preview" class="hidden text-3xl text-yellow-500 min-w-[50px] flex justify-center items-center">
+                    <i id="content-icon-display" class="bi"></i>
+                </div>
+            </div>
+        </div>
+
+        {{-- Status Konten --}}
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Status Konten</label>
+            <select name="is_active" class="w-full border border-gray-400 rounded-xl px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm">
+                <option value="1" selected>Aktif</option>
+                <option value="0">Nonaktif</option>
+            </select>
+        </div>
+
+    </div>
+</div>
             {{-- TRANSLATION SECTIONS --}}
             <hr class="border-gray-100">
 
@@ -169,6 +180,7 @@
                         <i class="bi bi-stars"></i> Terjemahkan AI
                     </button>
                 </div>
+                    <small class="text-gray-400 mt-1 block">Apa bila token habis bisa isi manual.</small>
 
                 @foreach($languages as $language)
                     <div class="border rounded-xl p-6 mb-6 bg-gray-50">
@@ -202,7 +214,7 @@
                         </div>
 
                         <div class="mb-2">
-                            <label class="block mb-2 font-medium">Isi / Deskripsi Konten (Bisa Masukkan Gambar & Tabel)</label>
+                            <label class="block mb-2 font-medium">Deskripsi</label>
                             <div class="editor-container bg-white rounded-xl overflow-hidden border shadow-sm">
                                 {{-- PERBAIKAN: Ditambahkan id unik "body_{{ $language->id }}" agar TinyMCE dapat diakses JS --}}
                                 <textarea 
