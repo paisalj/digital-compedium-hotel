@@ -17,8 +17,20 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
+public function boot(): void
+{
+    $models = [
+        \App\Models\Content::class,
+        \App\Models\Category::class,
+        \App\Models\User::class,
+        \App\Models\Language::class, // Bahasa
+        \App\Models\Media::class,
+        \App\Models\Setting::class,
+        \App\Models\AiApiKey::class, // API Key
+    ];
+
+    foreach ($models as $model) {
+        $model::observe(\App\Observers\GlobalObserver::class);
     }
+}
 }

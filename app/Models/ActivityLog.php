@@ -10,14 +10,14 @@ class ActivityLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'action',
-        'description',
-        'ip_address',
-        'user_agent',
-    ];
-
+protected $fillable = [
+    'user_id',
+    'module',      // <--- Tambahkan ini
+    'action',
+    'description',
+    'ip_address',
+    'user_agent',  // (Opsional, jika Anda ingin menyimpannya)
+];
     /*
     |--------------------------------------------------------------------------
     | RELATIONSHIP

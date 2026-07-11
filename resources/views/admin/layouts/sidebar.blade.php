@@ -56,23 +56,17 @@
 
         </a>
 
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
+<a href="{{ route('admin.categories.index') }}"
+   class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.categories.*') ? 'bg-slate-800 border-l-4 border-blue-500' : '' }}">
+    <i class="bi bi-folder-fill"></i>
+    Kategori
+</a>
 
-            <i class="bi bi-folder-fill"></i>
-
-            Kategori
-
-        </a>
-
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
-
-            <i class="bi bi-file-earmark-text-fill"></i>
-
-            Konten
-
-        </a>
+<a href="{{ route('admin.contents.index') }}"
+   class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.contents.*') ? 'bg-slate-800 border-l-4 border-blue-500' : '' }}">
+    <i class="bi bi-file-earmark-text-fill"></i>
+    Konten
+</a>
 
         <a href="#"
            class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
@@ -83,15 +77,11 @@
 
         </a>
 
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
-
-            <i class="bi bi-translate"></i>
-
-            Bahasa
-
-        </a>
-
+<a href="{{ route('admin.languages.index') }}"
+   class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.languages.*') ? 'bg-slate-800 border-l-4 border-blue-500' : '' }}">
+    <i class="bi bi-translate"></i>
+    Bahasa
+</a>
         <a href="#"
            class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
 
@@ -101,25 +91,28 @@
 
         </a>
 
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
+<a href="{{ route('admin.activity-logs.index') }}" 
+   class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
 
-            <i class="bi bi-clock-history"></i>
+    <i class="bi bi-clock-history"></i>
 
-            Activity Log
+    Activity Log
 
-        </a>
+</a>
+        
 
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
+@if(auth()->user()->role == 'super_admin')
+    <a href="{{ route('admin.users.index') }}"
+       class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.users.*') ? 'bg-slate-800' : '' }}">
+        
+        <i class="bi bi-people-fill"></i>
+        
+        User
+        
+    </a>
+@endif
 
-            <i class="bi bi-people-fill"></i>
-
-            User
-
-        </a>
-
-    </nav>
+</nav>
 
     <!-- Logout -->
     <div class="border-t border-slate-700 p-5">
