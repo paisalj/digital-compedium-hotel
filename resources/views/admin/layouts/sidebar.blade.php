@@ -68,15 +68,11 @@
     Konten
 </a>
 
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
-
-            <i class="bi bi-images"></i>
-
-            Media
-
-        </a>
-
+<a href="{{ route('admin.media.index') }}"
+   class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
+    <i class="bi bi-images"></i>
+    Media
+</a>
 <a href="{{ route('admin.languages.index') }}"
    class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.languages.*') ? 'bg-slate-800 border-l-4 border-blue-500' : '' }}">
     <i class="bi bi-translate"></i>
