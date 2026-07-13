@@ -72,12 +72,13 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 
-            Route::post('/media/store', [MediaController::class, 'store'])->name('media.store');
+            Route::post('/media', [MediaController::class, 'store'])->name('media.store');
             Route::get('/media', [MediaController::class, 'index'])->name('media.index');
             Route::delete('/media/{id}', [MediaController::class, 'destroy'])->name('media.destroy');
             Route::get('/media/trash', [MediaController::class, 'trash'])->name('media.trash');
             Route::post('/media/{id}/restore', [MediaController::class, 'restore'])->name('media.restore');
             Route::delete('/media/{id}/force-delete', [MediaController::class, 'forceDelete'])->name('media.forceDelete');
+            Route::get('/media/create', [MediaController::class, 'create'])->name('media.create');
         });
     });
 });

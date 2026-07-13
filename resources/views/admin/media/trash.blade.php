@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Recycle Bin Media')
-@section('page-title', 'Recycle Bin')
+@section('page-title', 'Recycle Bin Media')
 
 @section('content')
 <div class="p-6">

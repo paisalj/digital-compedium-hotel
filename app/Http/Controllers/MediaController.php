@@ -18,32 +18,36 @@ public function index()
 
 public function store(Request $request)
 {
+    // 1. Validasi: alt_text sekarang 'required' (wajib)
     $request->validate([
         'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'alt_text' => 'nullable|string|max:255', // Validasi untuk nama gambar
+        'alt_text' => 'required|string|max:255', 
     ]);
 
     if ($request->file('file')) {
         $file = $request->file('file');
         
-        // Nama file asli untuk disimpan di server (tetap pakai waktu agar tidak bentrok)
+        // 2. Simpan file ke server
         $fileName = time() . '_' . $file->getClientOriginalName();
         $filePath = $file->storeAs('uploads', $fileName, 'public');
 
-        // Jika user mengisi nama gambar, gunakan itu. Jika tidak, gunakan nama file asli.
-        $namaGambar = $request->alt_text ? $request->alt_text : $file->getClientOriginalName();
-
+        // 3. Simpan data ke database (langsung gunakan alt_text dari input form)
         Media::create([
             'file_name' => $fileName,
             'file_path' => $filePath,
             'file_type' => $file->extension(),
             'mime_type' => $file->getClientMimeType(),
             'file_size' => $file->getSize(),
-            'alt_text' => $namaGambar, // Disimpan ke database
+            'alt_text' => $request->alt_text, // Mengambil langsung dari form
         ]);
 
-        return back()->with('success', 'Gambar berhasil diunggah ke Media Library!');
+        // 4. Kembali ke halaman utama dengan pesan sukses
+        return redirect()->route('admin.media.index')->with('success', 'Gambar berhasil diunggah ke Media Library!');
     }
+}
+public function create()
+{
+    return view('admin.media.create');
 }
 
 public function destroy($id)
