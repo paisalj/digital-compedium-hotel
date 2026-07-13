@@ -9,10 +9,24 @@ use Illuminate\Support\Facades\Storage;
 class MediaController extends Controller
 {
 
-public function index()
+public function index(Request $request)
 {
-    // Mengambil semua data media dan mengirimnya ke view
-    $media = Media::latest()->get(); 
+    // 1. Siapkan query dasar
+    $query = Media::latest();
+
+    // 2. Cek apakah ada input 'search'
+    if ($request->has('search') && $request->search != '') {
+        $searchKeyword = $request->search;
+        $query->where(function($q) use ($searchKeyword) {
+            $q->where('alt_text', 'like', '%' . $searchKeyword . '%')
+              ->orWhere('file_name', 'like', '%' . $searchKeyword . '%');
+        });
+    }
+
+    // 3. Gunakan paginate (misal 12 gambar per halaman) dan withQueryString
+    // dengan withQueryString, kata kunci pencarian akan tetap terbawa saat pindah halaman
+    $media = $query->paginate(10)->withQueryString(); 
+    
     return view('admin.media.index', compact('media'));
 }
 

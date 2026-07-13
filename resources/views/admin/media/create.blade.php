@@ -14,9 +14,9 @@
                 <h2 class="text-lg font-bold text-gray-800">Tambah Media</h2>
                 <p class="text-sm text-gray-600">Unggah file gambar baru ke dalam sistem.</p>
             </div>
-            <a href="{{ route('admin.media.index') }}" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-900 transition">
-                &larr; Kembali
-            </a>
+        <a href="{{ route('admin.media.index') }}" class="px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
         </div>
 
         <!-- Form Grid -->
