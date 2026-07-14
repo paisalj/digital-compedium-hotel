@@ -59,8 +59,8 @@ public function create()
         $categories = Category::with('translations')->get();
         $languages = Language::where('is_active', true)->get();
 
-
-        return view('admin.contents.create', compact('categories', 'languages'));
+$media = \App\Models\Media::all();
+return view('admin.contents.create', compact('languages', 'categories', 'media'));
     }
 
 public function store(Request $request)
@@ -115,16 +115,19 @@ public function store(Request $request)
     }
 }
 public function edit(string $id)
-    {
-        $content = Content::findOrFail($id);
-        $categories = Category::with('translations')->get();
-        $languages = Language::where('is_active', true)->get();
-        
-        $translations = $content->translations->keyBy('language_id');
+{
+    $content = Content::findOrFail($id);
+    $categories = Category::with('translations')->get();
+    $languages = Language::where('is_active', true)->get();
 
-        return view('admin.contents.edit', compact('content', 'categories', 'languages', 'translations'));
-    }
+    // Jalur penuh sudah benar agar tidak error class not found
+    $media = \App\Models\Media::latest()->get(); 
+    
+    $translations = $content->translations->keyBy('language_id');
 
+    // PERBAIKAN: Tambahkan 'media' di paling kanan compact
+    return view('admin.contents.edit', compact('content', 'categories', 'languages', 'translations', 'media'));
+}
     public function update(Request $request, string $id)
     {
         $content = Content::findOrFail($id);

@@ -18,39 +18,62 @@ class SettingSeeder extends Seeder
             // HOTEL
             // ==========================
 
+[
+                'key' => 'hotel_logo',
+                'value' => '',
+                'type' => 'image',
+                'group' => 'hotel',
+                'label' => 'Logo Hotel',
+                'description' => 'Logo utama hotel (tampil di paling atas)',
+                'is_public' => true,
+                'sort_order' => 1,
+            ],
+
             [
                 'key' => 'hotel_name',
                 'value' => 'M Bahalap Hotel',
                 'type' => 'text',
                 'group' => 'hotel',
                 'label' => 'Nama Hotel',
-                'description' => 'Nama resmi hotel',
-                'is_public' => true,
-                'sort_order' => 1,
-            ],
-
-            [
-                'key' => 'hotel_logo',
-                'value' => '',
-                'type' => 'image',
-                'group' => 'hotel',
-                'label' => 'Logo Hotel',
-                'description' => 'Logo utama hotel',
+                'description' => 'Nama resmi hotel (tampil di bawah logo)',
                 'is_public' => true,
                 'sort_order' => 2,
             ],
 
             [
-                'key' => 'hotel_description',
-                'value' => 'Selamat datang di M Bahalap Hotel.',
-                'type' => 'textarea',
+                'key' => 'hotel_welcome_title',
+                'value' => 'Selamat Datang di M Bahalap Hotel',
+                'type' => 'text',
                 'group' => 'hotel',
-                'label' => 'Deskripsi Hotel',
-                'description' => 'Deskripsi singkat hotel',
+                'label' => 'Judul Selamat Datang',
+                'description' => 'Teks utama sambutan (Teks Tebal)',
                 'is_public' => true,
                 'sort_order' => 3,
             ],
 
+            [
+                'key' => 'hotel_description',
+                'value' => 'Merupakan suatu kehormatan bagi kami menerima Anda di sini...',
+                'type' => 'textarea',
+                'group' => 'hotel',
+                'label' => 'Deskripsi Sambutan',
+                'description' => 'Teks paragraf di bawah garis pembatas',
+                'is_public' => true,
+                'sort_order' => 4,
+            ],
+
+            [
+                'key' => 'hotel_background',
+                'value' => '',
+                'type' => 'image',
+                'group' => 'hotel',
+                'label' => 'Background Utama',
+                'description' => 'Gambar latar belakang halaman depan tamu',
+                'is_public' => true,
+                'sort_order' => 5,
+            ],
+
+            
             // ==========================
             // CONTACT
             // ==========================
@@ -63,7 +86,7 @@ class SettingSeeder extends Seeder
                 'label' => 'Nomor Telepon',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 4,
+                'sort_order' => 5,
             ],
 
             [
@@ -74,7 +97,7 @@ class SettingSeeder extends Seeder
                 'label' => 'Email Hotel',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 5,
+                'sort_order' => 6,
             ],
 
             [
@@ -85,7 +108,7 @@ class SettingSeeder extends Seeder
                 'label' => 'Alamat Hotel',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 6,
+                'sort_order' => 7,
             ],
 
             [
@@ -96,7 +119,7 @@ class SettingSeeder extends Seeder
                 'label' => 'WhatsApp Reception',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 7,
+                'sort_order' => 8,
             ],
 
             // ==========================
@@ -111,7 +134,7 @@ class SettingSeeder extends Seeder
                 'label' => 'Instagram',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 8,
+                'sort_order' => 9,
             ],
 
             [
@@ -122,7 +145,7 @@ class SettingSeeder extends Seeder
                 'label' => 'Facebook',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 9,
+                'sort_order' => 10,
             ],
 
             [
@@ -133,7 +156,7 @@ class SettingSeeder extends Seeder
                 'label' => 'YouTube',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 10,
+                'sort_order' => 11,
             ],
 
             // ==========================
@@ -148,13 +171,17 @@ class SettingSeeder extends Seeder
                 'label' => 'Footer Website',
                 'description' => '',
                 'is_public' => true,
-                'sort_order' => 11,
+                'sort_order' => 12,
             ],
 
         ];
 
+        // 👇 Mengubah create menjadi updateOrCreate agar tidak duplikat saat dijalankan ulang 👇
         foreach ($settings as $setting) {
-            Setting::create($setting);
+            Setting::updateOrCreate(
+                ['key' => $setting['key']], // Cari berdasarkan 'key'
+                $setting // Update atau buat baru dengan data ini
+            );
         }
     }
 }

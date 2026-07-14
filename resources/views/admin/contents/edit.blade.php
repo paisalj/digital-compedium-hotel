@@ -242,6 +242,54 @@
 
 </div>
 
+
+<!-- Modal Media Library -->
+<div id="mediaModal" class="hidden fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="p-5 border-b flex justify-between items-center bg-gray-50">
+            <h3 class="text-xl font-bold text-gray-800">Media Library</h3>
+            <button type="button" onclick="closeMediaModal()" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+        </div>
+
+<!-- Search Bar saja (tanpa tombol upload) -->
+<div class="p-4 border-b">
+    <input type="text" id="mediaSearch" placeholder="Cari nama gambar..." 
+           onkeyup="filterMedia()" class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+</div>
+
+<!-- Grid Gambar dengan Nama File -->
+<div id="mediaGrid" class="p-5 overflow-y-auto flex-1 grid grid-cols-4 gap-4">
+<!-- UBAH BAGIAN INI DI CREATE.BLADE.PHP -->
+@foreach($media as $item)
+    <div class="media-item group cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition-all bg-white hover:shadow-md" 
+         data-name="{{ strtolower($item->alt_text) }}"
+         onclick="selectImage('{{ asset('storage/'.$item->file_path) }}', this)"> <!-- Tambahkan parameter 'this' -->
+        
+        <div class="w-full h-24 overflow-hidden rounded">
+            <img src="{{ asset('storage/'.$item->file_path) }}" class="w-full h-full object-cover">
+        </div>
+        
+        <p class="text-[11px] text-gray-700 mt-2 truncate text-center font-medium bg-gray-50 py-1 rounded">
+            {{ $item->alt_text }}
+        </p>
+    </div>
+@endforeach
+        </div>
+
+        <!-- Footer (Pagination & Action) -->
+        <div class="p-4 border-t flex justify-between items-center bg-gray-50">
+            <div class="text-xs text-gray-500">Menampilkan {{ $media->count() }} media</div>
+            <div class="flex gap-2">
+                <button type="button" onclick="closeMediaModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Cancel</button>
+                <button type="button" onclick="confirmSelection()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Pilihan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 @endsection
 
 @push('scripts')
@@ -251,6 +299,64 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+// ===================================================================
+// VARIABLE & FUNGSI GLOBAL MEDIA LIBRARY (Scope Luar)
+// ===================================================================
+let tinymceCallback = null;
+let selectedImageUrl = null;
+
+function openMediaModal(callback) {
+    tinymceCallback = callback;
+    // Buka modal library kita di atas modal TinyMCE
+    document.getElementById('mediaModal').classList.remove('hidden');
+}
+
+function closeMediaModal() {
+    // Sembunyikan modal library saja
+    document.getElementById('mediaModal').classList.add('hidden');
+}
+
+function selectImage(url, element) {
+    selectedImageUrl = url;
+    // Beri efek border biru pada gambar yang dipilih
+    document.querySelectorAll('.media-item').forEach(el => {
+        el.classList.remove('border-blue-500', 'ring-2', 'ring-blue-500');
+    });
+    if (element) {
+        element.classList.add('border-blue-500', 'ring-2', 'ring-blue-500');
+    }
+}
+
+function confirmSelection() {
+    if (selectedImageUrl && tinymceCallback) {
+        // Kirim URL gambar ke kolom "Source" modal TinyMCE
+        tinymceCallback(selectedImageUrl, { alt: 'Gambar konten' });
+        
+        // Reset & Tutup modal library
+        tinymceCallback = null;
+        selectedImageUrl = null;
+        closeMediaModal();
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Pilih Gambar',
+            text: 'Silakan klik salah satu gambar terlebih dahulu!'
+        });
+    }
+}
+
+function filterMedia() {
+    let filter = document.getElementById('mediaSearch').value.toLowerCase();
+    let items = document.getElementsByClassName('media-item');
+    for (let i = 0; i < items.length; i++) {
+        let name = items[i].getAttribute('data-name');
+        items[i].style.display = name.includes(filter) ? "" : "none";
+    }
+}
+
+// ===================================================================
+// INISIALISASI SAAT DOM READY (Scope Dalam)
+// ===================================================================
 document.addEventListener('DOMContentLoaded', function() {
     // === 1. VARIABEL UNTUK KATEGORI (BAWAAN) ===
     const categorySelect = document.getElementById('category-select');
@@ -261,7 +367,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentIconInput = document.getElementById('content-icon-input');
     const contentIconPreview = document.getElementById('content-icon-preview');
     const contentIconDisplay = document.getElementById('content-icon-display');
-
 
     // === 3. FUNGSI PREVIEW IKON KATEGORI (BAWAAN) ===
     function updateIconPreview() {
@@ -290,8 +395,8 @@ document.addEventListener('DOMContentLoaded', function() {
             contentIconPreview.classList.add('hidden');
         }
     }
+
     if (categorySelect) {
-        // 1. MENGUBAH SELECT BIASA MENJADI CHOICES.JS (DROPDOWN PENDEK YANG BISA DI-SCROLL)
         const choicesInstance = new Choices(categorySelect, {
             searchEnabled: true,
             searchPlaceholderValue: 'Cari kategori...',
@@ -299,23 +404,26 @@ document.addEventListener('DOMContentLoaded', function() {
             shouldSort: false,
         });
 
-        // 2. MENGATUR MUNCULNYA IKON EMAS SAAT KATEGORI DIPILIH / BERUBAH
         categorySelect.addEventListener('change', updateIconPreview);
-        
-        // JALANKAN OTOMATIS SAAT EDIT DI-LOAD: Agar data lama terdeteksi dan ikon emasnya langsung nangkring rapi
+        // Jalankan otomatis saat edit di-load agar data lama terdeteksi
         updateIconPreview();
     }
 
-    // PERBAIKAN: Menyesuaikan selektor form pencarian ke arah rute update konten
+    // Dengarkan perubahan input pada ikon konten jika element ada
+    if (contentIconInput) {
+        contentIconInput.addEventListener('input', updateContentIconPreview);
+        updateContentIconPreview(); // Jalankan otomatis saat data lama termuat
+    }
+
+    // Perbaikan selektor form agar memaksa penyimpanan TinyMCE saat update data
     const form = document.querySelector('form[action="{{ route("admin.contents.update", $content->id) }}"]');
     if (form) {
         form.addEventListener('submit', function() {
-            // Ini memaksa TinyMCE untuk menyalin konten ke textarea sebelum dikirim
             tinymce.triggerSave();
         });
     }
 
-    // Inisialisasi TinyMCE Editor
+    // Inisialisasi TinyMCE Editor (Sudah Diperbaiki)
     tinymce.init({
         selector: '.tinymce-editor',
         height: 350,
@@ -332,27 +440,11 @@ document.addEventListener('DOMContentLoaded', function() {
         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: #374151; }',
         automatic_uploads: true,
         file_picker_types: 'image',
+        // SINKRONISASI MODAL MEDIA LIBRARY
         file_picker_callback: (cb, value, meta) => {
-            const input = document.createElement('input');
-            input.setAttribute('type', 'file');
-            input.setAttribute('accept', 'image/*');
-
-            input.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.addEventListener('load', () => {
-                    const id = 'blobid' + (new Date()).getTime();
-                    const blobCache = tinymce.activeEditor.editorUpload.blobCache;
-                    const base64 = reader.result.split(',')[1];
-                    const blobInfo = blobCache.create(id, file, base64);
-                    blobCache.add(blobInfo);
-
-                    cb(blobInfo.blobUri(), { title: file.name });
-                });
-                reader.readAsDataURL(file);
-            });
-
-            input.click();
+            if (meta.filetype === 'image') {
+                openMediaModal(cb); 
+            }
         }
     });
 
@@ -403,7 +495,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const sourceTitle = indoTitleInput.value.trim();
 
             try {
-                // KIRIM JUDUL & DESKRIPSI KE BACKEND
                 const response = await fetch("{{ route('admin.contents.translate') }}", {
                     method: "POST",
                     headers: {
@@ -441,7 +532,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     return; 
                 }
 
-                // MASUKKAN HASIL TERJEMAHAN KE JUDUL & TINYMCE MASING-MASING BAHASA
                 if (result.translations) {
                     Object.keys(result.translations).forEach(langId => {
                         const titleInput = document.querySelector(`[name="translations[${langId}][title]"]`);

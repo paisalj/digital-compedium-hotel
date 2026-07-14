@@ -79,6 +79,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/media/{id}/restore', [MediaController::class, 'restore'])->name('media.restore');
             Route::delete('/media/{id}/force-delete', [MediaController::class, 'forceDelete'])->name('media.forceDelete');
             Route::get('/media/create', [MediaController::class, 'create'])->name('media.create');
+
+            Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+            Route::put('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+
         });
     });
 });

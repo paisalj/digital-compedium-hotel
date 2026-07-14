@@ -78,15 +78,14 @@
     <i class="bi bi-translate"></i>
     Bahasa
 </a>
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
+<a href="{{ route('admin.settings.index') }}"
+   class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
 
-            <i class="bi bi-gear-fill"></i>
+    <i class="bi bi-gear-fill"></i>
 
-            Pengaturan
+    Pengaturan
 
-        </a>
-
+</a>
 <a href="{{ route('admin.activity-logs.index') }}" 
    class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
 

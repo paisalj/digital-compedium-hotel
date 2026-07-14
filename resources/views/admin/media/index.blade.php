@@ -93,9 +93,6 @@
                         </div>
                         
                         <!-- Navigasi Halaman -->
-<div class="mt-8">
-    {{ $media->links() }}
-</div>
 <!-- Informasi File -->
 <!-- Informasi File -->
 <div class="p-2 bg-gray-50 border-t border-gray-200">
