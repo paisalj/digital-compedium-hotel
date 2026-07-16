@@ -10,10 +10,22 @@ use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\GuestController;
+use App\Http\Controllers\Admin\SettingController; // 🛠️ BARU: Import SettingController di sini
 
 /*
 |--------------------------------------------------------------------------
-| Guest Routes
+| Guest / Public Landing Page Routes (Bisa Diakses Siapa Saja Tanpa Login)
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [GuestController::class, 'index'])->name('guest.home');
+Route::get('/category', [GuestController::class, 'category'])->name('guest.category');
+Route::get('/content/{slug}', [GuestController::class, 'content'])->name('guest.content');
+
+
+/*
+|--------------------------------------------------------------------------
+| Auth Gate Routes (Hanya untuk user yang BELUM login)
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
@@ -23,7 +35,7 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes (Protected)
+| Authenticated Routes (Protected - Wajib Login Terlebih Dahulu)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -69,7 +81,6 @@ Route::middleware('auth')->group(function () {
             Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
-
             Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 
             Route::post('/media', [MediaController::class, 'store'])->name('media.store');
@@ -80,12 +91,11 @@ Route::middleware('auth')->group(function () {
             Route::delete('/media/{id}/force-delete', [MediaController::class, 'forceDelete'])->name('media.forceDelete');
             Route::get('/media/create', [MediaController::class, 'create'])->name('media.create');
 
-            Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
-            Route::put('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
-
+            // 🛠️ DIPERBAIK: Menggunakan Class yang sudah di-import dan menghapus Route::resource yang duplikat
+            Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::post('settings/translate', [SettingController::class, 'translate'])->name('settings.translate');
+            Route::get('/switch-language/{lang_code}', [App\Http\Controllers\HomeController::class, 'switchLanguage'])->name('lang.switch');
         });
     });
 });
-
-/* Redirect Default */
-Route::redirect('/', '/login');

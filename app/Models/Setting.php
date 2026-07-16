@@ -23,4 +23,11 @@ class Setting extends Model
     protected $casts = [
         'is_public' => 'boolean',
     ];
+    public function translations()
+{
+    // Mengikuti pola content/category_translations
+    return $this->hasMany(SettingTranslation::class, 'setting_id');
+}
+
+
 }
