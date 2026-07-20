@@ -94,8 +94,16 @@
     Activity Log
 
 </a>
-        
+  
 
+<!-- Bagian bawah sidebar -->
+<div class="mt-auto border-t border-gray-700 pt-4">
+    <!-- Link Mode Admin / Lihat Website -->
+    <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+        <i class="bi bi-eye"></i> 
+        <span>Lihat Website</span>
+    </a>
+    
 @if(auth()->user()->role == 'super_admin')
     <a href="{{ route('admin.users.index') }}"
        class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.users.*') ? 'bg-slate-800' : '' }}">
@@ -106,6 +114,8 @@
         
     </a>
 @endif
+</div>
+
 
 </nav>
 

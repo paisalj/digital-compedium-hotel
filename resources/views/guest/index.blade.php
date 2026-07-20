@@ -25,13 +25,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ $settings['hotel_name'] ?? 'M Bahalap Hotel' }}</title>
     
+    <link rel="icon" type="image/png" href="{{ isset($settings['hotel_logo']) && $settings['hotel_logo'] ? asset('storage/' . $settings['hotel_logo']) : asset('images/default-logo.png') }}">
     <!-- Google Fonts Kustom dari PHP Native -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Laravel Vite Asset Loading (Untuk Tailwind & Asset project) -->
     @vite('resources/css/app.css')
+<script>
+    // Paksa agar saat pertama buka/refresh selalu berstatus Light Mode (Terang)
+    if (!localStorage.getItem('theme')) {
+        localStorage.setItem('theme', 'light');
+    }
 
-    <style>
+    // Terapkan class berdasarkan LocalStorage saja (abaikan sistem dark mode laptop/HP)
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+</script>
+<style>
         /* FIX STRUKTUR PAS 1 LAYAR PENUH (ANTI-SCROLL - LOCKED) */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         html, body { 
@@ -226,14 +239,14 @@
         .delay-300 { animation-delay: 0.25s; }
         .delay-400 { animation-delay: 0.35s; }
 
-        /* Tombol Bahasa */
+/* Tombol Bahasa & Tombol Tema Dasar */
         .btn-bahasa {
             display: inline-flex;
             justify-content: center;
             align-items: center;
             gap: 2px;
             border-radius: 9999px;
-            border: 1px solid rgba(229, 231, 235, 0.8);
+            border: 1px solid rgba(197, 154, 54, 0.6); /* Border emas tipis di mode siang */
             background-color: rgba(255, 255, 255, 0.95);
             padding: 5px 12px;
             font-size: 11px;
@@ -242,6 +255,11 @@
             cursor: pointer;
         }
         
+        /* Styling Khusus Tombol Bulat Mode (Matahari/Bulan) */
+        #theme-toggle {
+            border: 2px solid #c59a36 !important; /* Border emas menyala */
+            box-shadow: 0 2px 5px rgba(197, 154, 54, 0.3);
+        }
         .stars-container {
             display: flex;
             justify-content: center;
@@ -260,12 +278,96 @@
             text-align: center;
             z-index: 20;
         }
-    </style>
-</head>
-<body> 
-    <div class="bg-pattern"></div>
+/* ========================================================= */
+        /* 👇 BAGIAN BARU YANG DITAMBAHKAN UNTUK MENGATUR DARK MODE 👇 */
+        /* ========================================================= */
+        
+        html.dark body {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.90), rgba(15, 23, 42, 0.90)), 
+                              url('{{ isset($settings['hotel_background']) && $settings['hotel_background'] ? asset("storage/" . $settings['hotel_background']) : asset("assets/img/default_bg.jpg") }}') !important;
+        }
 
-    <!-- 🌐 DROPDOWN BAHASA -->
+        html.dark .dynamic-sambutan, 
+        html.dark .dynamic-sambutan * {
+            color: #f3f4f6 !important; 
+        }
+
+        html.dark .dynamic-deskripsi, 
+        html.dark .dynamic-deskripsi * {
+            color: #94a3b8 !important; 
+        }
+
+        /* Tombol Bahasa & Toggle saat Mode Malam */
+        html.dark .btn-bahasa {
+            background-color: rgba(30, 41, 59, 0.9) !important;
+            border-color: #c59a36 !important; /* Border emas di mode malam */
+            color: #f3f4f6 !important;
+        }
+
+        html.dark #theme-toggle {
+            background-color: rgba(30, 41, 59, 0.9) !important;
+            border-color: #c59a36 !important; /* Border emas tetap menyala */
+            color: #f3f4f6 !important;
+        }
+
+        /* ========================================================= */
+        /* PERBAIKAN TOTAL DROPDOWN BAHASA DI MODE MALAM             */
+        /* ========================================================= */
+        
+        /* 1. Paksa kotak utama dropdown jadi gelap gulita & berborder emas */
+        html.dark div#boxDropdownLang,
+        html.dark #boxDropdownLang {
+            background-color: #1e293b !important;
+            border-color: #c59a36 !important;     
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+        }
+        
+        /* 2. Paksa SEMUA elemen & teks di dalam dropdown agar background transparan & teksnya putih bersih */
+        html.dark #boxDropdownLang *,
+        html.dark #boxDropdownLang span, 
+        html.dark #boxDropdownLang div,
+        html.dark #boxDropdownLang a {
+            background-color: transparent !important;
+            color: #ffffff !important; /* Putih bersih tanpa pudar */
+            opacity: 1 !important;
+            text-shadow: none !important;
+        }
+        
+        /* 3. Efek hover saat kursor/sentuhan diarahkan ke pilihan bahasa */
+        html.dark #boxDropdownLang a:hover,
+        html.dark #boxDropdownLang div:hover {
+            background-color: #334155 !important;
+            color: #fbbf24 !important; /* Berubah jadi warna emas saat dipilih */
+        }
+        
+        html.dark footer p {
+            color: #94a3b8 !important;
+        }
+        /* ========================================================= */
+        
+        </style>
+    </head>
+<body class="transition-colors duration-300 dark:bg-slate-900 dark:text-slate-100">
+        <div class="bg-pattern"></div>
+<!-- 🌙 TOMBOL GANTI MODE (IKON BULAN DICERMINKAN AGAR ARAHNYA BERUBAH) -->
+<div style="position: absolute; top: 14px; left: 14px; z-index: 50;" class="animate-fade-in">
+    <button id="theme-toggle" onclick="toggleDarkMode()" type="button" 
+            class="btn-favorit shadow-sm hover:shadow-md" 
+            style="width: 32px; height: 32px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
+        
+        <!-- Ikon Matahari (Mode Siang) -->
+        <svg id="theme-toggle-light-icon" class="hidden" style="width: 16px; height: 16px; color: #f59e0b;" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+        </svg>
+        
+        <!-- Ikon Bulan (Mode Malam - Ditambah transform: scaleX(-1) agar arahnya berbalik) -->
+        <svg id="theme-toggle-dark-icon" class="hidden" style="width: 16px; height: 16px; color: #fbbf24; transform: scaleX(-1);" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+
+    </button>
+</div>
+<!-- 🌐 DROPDOWN BAHASA -->
     <div style="position: absolute; top: 14px; right: 14px; z-index: 50; display: inline-block;" class="animate-fade-in">
         <button type="button" id="btnDropdownLang" onclick="toggleLangDropdown(event)" 
                 class="btn-bahasa" 
@@ -286,13 +388,13 @@
              style="position: absolute; right: 0; margin-top: 8px; width: 140px; border-radius: 10px; background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden;">
             <div style="padding: 4px 6px 0;">
                 <a href="?lang=id" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #374151; text-decoration: none; font-weight: 600; {{ $currentLang == 'id' ? 'background-color: #fef3c7; color: #c59a36;' : '' }}">
-                    <span>🇮🇩</span> Indonesia
+                    <span>ID</span> Indonesia
                 </a>
                 <a href="?lang=en" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #374151; text-decoration: none; font-weight: 600; {{ $currentLang == 'en' ? 'background-color: #fef3c7; color: #c59a36;' : '' }}">
-                    <span>🇬🇧</span> English
+                    <span>EN</span> English
                 </a>
                 <a href="?lang=dayak" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #374151; text-decoration: none; font-weight: 600; {{ $currentLang == 'dayak' ? 'background-color: #fef3c7; color: #c59a36;' : '' }}">
-                    <span>🛡️</span> Dayak
+                    <span>DK</span> Dayak
                 </a>
             </div>
         </div>
@@ -339,7 +441,7 @@
             <!-- 🔽 KELOMPOK BAWAH -->
             <div class="btn-gold-wrapper animate-fade-in delay-400">
                 <!-- Parameter Bahasa Ikut Dikirim ke Halaman Category -->
-                <a href="{{ route('guest.category', ['lang' => $currentLang]) }}" class="btn-gold shadow-lg active:scale-95 transition-transform duration-150">
+                <a href="{{ route('guest.categories', ['lang' => $currentLang]) }}" class="btn-gold shadow-lg active:scale-95 transition-transform duration-150">
                     <span>Digital Compendium</span>
                     <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -358,23 +460,60 @@
     </footer>
 
     <!-- ⚡ UTILITY JAVASCRIPT DROPDOWN -->
-    <script>
-        function toggleLangDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('boxDropdownLang');
-            if (dropdown.style.display === 'block') {
-                dropdown.style.display = 'none';
-            } else {
-                dropdown.style.display = 'block';
-            }
+<script>
+    function toggleLangDropdown(event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById('boxDropdownLang');
+        dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+    }
+
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('boxDropdownLang');
+        const button = document.getElementById('btnDropdownLang');
+        if (dropdown && button && !button.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
         }
-        window.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('boxDropdownLang');
-            const button = document.getElementById('btnDropdownLang');
-            if (dropdown && !button.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
-            }
-        });
-    </script>
+    });
+
+    function toggleDarkMode() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            updateThemeIcons('light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            updateThemeIcons('dark');
+        }
+    }
+
+    function updateThemeIcons(theme) {
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        
+        if (!lightIcon || !darkIcon) return;
+
+        if (theme === 'dark') {
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
+        } else {
+            lightIcon.classList.remove('hidden');
+            darkIcon.classList.add('hidden');
+        }
+    }
+
+    // Dijalankan saat DOM selesai dimuat agar elemen pasti sudah ada
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentTheme = localStorage.getItem('theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        updateThemeIcons(currentTheme);
+    });
+</script>
 </body>
 </html>

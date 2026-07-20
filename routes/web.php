@@ -19,7 +19,10 @@ use App\Http\Controllers\Admin\SettingController; // 🛠️ BARU: Import Settin
 |--------------------------------------------------------------------------
 */
 Route::get('/', [GuestController::class, 'index'])->name('guest.home');
-Route::get('/category', [GuestController::class, 'category'])->name('guest.category');
+// Tambahkan tanda ? setelah id
+// Tambahkan ini jika belum ada (sesuaikan dengan nama controller kamu)
+Route::get('/categories', [GuestController::class, 'category'])->name('guest.categories');
+Route::get('/category/{slug}', [GuestController::class, 'category'])->name('guest.category');
 Route::get('/content/{slug}', [GuestController::class, 'content'])->name('guest.content');
 
 
