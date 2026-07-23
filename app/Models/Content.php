@@ -21,6 +21,11 @@ class Content extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(GuestFavorite::class, 'content_id'); 
+        // Sesuaikan nama Model relasinya jika berbeda (misal: GuestFavorite atau Favorite)
+    }
     // Relasi ke semua terjemahan milik konten ini
     public function translations()
     {

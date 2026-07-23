@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\GuestController;
-use App\Http\Controllers\Admin\SettingController; // 🛠️ BARU: Import SettingController di sini
+use App\Http\Controllers\Admin\SettingController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -19,11 +20,10 @@ use App\Http\Controllers\Admin\SettingController; // 🛠️ BARU: Import Settin
 |--------------------------------------------------------------------------
 */
 Route::get('/', [GuestController::class, 'index'])->name('guest.home');
-// Tambahkan tanda ? setelah id
-// Tambahkan ini jika belum ada (sesuaikan dengan nama controller kamu)
 Route::get('/categories', [GuestController::class, 'category'])->name('guest.categories');
 Route::get('/category/{slug}', [GuestController::class, 'category'])->name('guest.category');
 Route::get('/content/{slug}', [GuestController::class, 'content'])->name('guest.content');
+Route::post('/guest/favorite/toggle', [GuestController::class, 'toggleFavorite']);
 
 
 /*
@@ -74,17 +74,6 @@ Route::middleware('auth')->group(function () {
         Route::post('contents/translate', [ContentController::class, 'translate'])->name('contents.translate');
         Route::resource('contents', ContentController::class);
 
-        // --- Fitur Terbatas untuk Super Admin saja ---
-        Route::middleware('role:super_admin')->group(function () {
-            Route::get('/users', [UserController::class, 'index'])->name('users.index');
-            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-            Route::post('/users', [UserController::class, 'store'])->name('users.store');
-            Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-            Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-            Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-            Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-
-            Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 
             Route::post('/media', [MediaController::class, 'store'])->name('media.store');
             Route::get('/media', [MediaController::class, 'index'])->name('media.index');
@@ -99,6 +88,20 @@ Route::middleware('auth')->group(function () {
             Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
             Route::post('settings/translate', [SettingController::class, 'translate'])->name('settings.translate');
             Route::get('/switch-language/{lang_code}', [App\Http\Controllers\HomeController::class, 'switchLanguage'])->name('lang.switch');
+
+
+        // --- Fitur Terbatas untuk Super Admin saja ---
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('/users', [UserController::class, 'index'])->name('users.index');
+            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+            Route::post('/users', [UserController::class, 'store'])->name('users.store');
+            Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+            Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+            Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+            Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+            Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+
         });
     });
 });

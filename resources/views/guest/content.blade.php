@@ -385,13 +385,13 @@
         @endif
         {{ $translation->title }}
 
-<!-- TOMBOL BOOKMARK: Mentok Paling Kanan Atas Kartu -->
+<!-- TOMBOL BOOKMARK -->
 <button type="button" 
         onclick="toggleFavorite(this)" 
         data-id="{{ $item->id }}" 
-        data-slug="{{ $translation->slug }}"
-        data-title="{{ $translation->title }}" 
-data-url="{{ url('/content/' . $category->slug . '?lang=' . $currentLang) }}"
+        data-slug="{{ $translation->slug ?? '' }}"
+        data-title="{{ $translation->title ?? '' }}" 
+        data-url="{{ url()->current() }}"
         class="favorite-btn absolute top-4 right-4 p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:text-amber-500 transition-all cursor-pointer shadow-xs z-10">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -462,6 +462,7 @@ data-url="{{ url('/content/' . $category->slug . '?lang=' . $currentLang) }}"
     </div>
 
     <!-- ⚡ SCRIPTS -->
+<!-- ⚡ SCRIPTS -->
     <script>
         // 1. Script Copy to Clipboard
         function copyToClipboard(text) {
@@ -472,9 +473,9 @@ data-url="{{ url('/content/' . $category->slug . '?lang=' . $currentLang) }}"
             });
         }
 
-        // 2. Script Dropdown Bahasa
+        // 2. Script Dropdown Bahasa (Gunakan satu versi yang lengkap dengan animasi panah)
         function toggleLangDropdown(event) {
-            event.stopPropagation(); // Mencegah event klik menyebar
+            event.stopPropagation();
             const dropdown = document.getElementById('boxDropdownLang');
             const arrow = document.getElementById('arrowDropdownLang');
             
@@ -488,23 +489,22 @@ data-url="{{ url('/content/' . $category->slug . '?lang=' . $currentLang) }}"
         }
 
         // Menutup dropdown jika user klik area kosong di luar tombol
-        window.onclick = function(event) {
+        window.addEventListener('click', function(event) {
             const dropdown = document.getElementById('boxDropdownLang');
             const arrow = document.getElementById('arrowDropdownLang');
             
-            if (!event.target.closest('#btnDropdownLang') && !dropdown.classList.contains('hidden')) {
+            if (!event.target.closest('#btnDropdownLang') && dropdown && !dropdown.classList.contains('hidden')) {
                 dropdown.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
+                if(arrow) arrow.style.transform = 'rotate(0deg)';
             }
-        }
+        });
         
-        // Listener Scroll
+        // Listener Scroll untuk Tombol Navigasi & Sticky Title
         window.addEventListener('scroll', function() {
             const navButtons = document.getElementById('navButtons');
             const mainTitle = document.getElementById('mainCategoryTitle');
             const stickyTitle = document.getElementById('stickyCategoryTitle');
             
-            // Logic navButtons
             if (window.scrollY > 9) {
                 navButtons.classList.remove('opacity-0', 'pointer-events-none');
                 navButtons.classList.add('opacity-100');
@@ -513,7 +513,6 @@ data-url="{{ url('/content/' . $category->slug . '?lang=' . $currentLang) }}"
                 navButtons.classList.remove('opacity-100');
             }
 
-            // Logic Sticky Title
             if (mainTitle && stickyTitle) {
                 if (window.scrollY > (mainTitle.offsetTop + mainTitle.offsetHeight)) {
                     stickyTitle.style.opacity = "1";
@@ -523,160 +522,165 @@ data-url="{{ url('/content/' . $category->slug . '?lang=' . $currentLang) }}"
             }
         });
 
-        // 1. Fungsi saat halaman dimuat untuk mengecek status favorit
-    document.addEventListener("DOMContentLoaded", function () {
-        loadFavoritesToDrawer();
-        updateButtonStates();
-    });
+function toggleFavorite(button) {
+    const id = button.getAttribute('data-id');
+    const slug = button.getAttribute('data-slug');
+    const title = button.getAttribute('data-title');
+    const url = button.getAttribute('data-url');
 
-// 2. Fungsi Klik Tombol Bookmark
-    function toggleFavorite(button) {
-        const id = button.getAttribute('data-id');
-        const slug = button.getAttribute('data-slug'); // <-- TAMBAHKAN INI
-        const title = button.getAttribute('data-title');
-        const url = button.getAttribute('data-url');
+    // 1. Eksekusi LocalStorage & UI dulu agar tombol langsung responsif saat diklik
+    let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+    const index = favorites.findIndex(fav => fav.id == id || fav.slug === slug);
 
-        let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
-        
-        // Cek apakah sudah ada di localStorage berdasarkan id atau slug
-        const index = favorites.findIndex(fav => fav.id === id || fav.slug === slug);
-
-        if (index > -1) {
-            // Jika sudah ada, hapus dari favorit (Unlike)
-            favorites.splice(index, 1);
-            button.classList.remove('text-amber-500', 'bg-amber-50', 'border-amber-200');
+    if (index > -1) {
+        favorites.splice(index, 1);
+        button.classList.remove('text-amber-500', 'bg-amber-50', 'border-amber-200');
+        if (button.querySelector('svg')) {
             button.querySelector('svg').setAttribute('fill', 'none');
-        } else {
-            // Jika belum ada, tambahkan ke favorit (Like) - SERTAKAN SLUG
-            favorites.push({ id, slug, title, url }); // <-- TAMBAHKAN slug DISINI
-            button.classList.add('text-amber-500', 'bg-amber-50', 'border-amber-200');
+        }
+    } else {
+        favorites.push({ id, slug, title, url });
+        button.classList.add('text-amber-500', 'bg-amber-50', 'border-amber-200');
+        if (button.querySelector('svg')) {
             button.querySelector('svg').setAttribute('fill', 'currentColor');
         }
+    }
 
-        // Simpan kembali ke localStorage
-        localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
-        
-        // Perbarui tampilan di dalam wadah drawer
+    localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
+    
+    // Cek apakah fungsi drawer ada sebelum dipanggil agar tidak error
+    if (typeof loadFavoritesToDrawer === 'function') {
         loadFavoritesToDrawer();
     }
 
-    // 3. Fungsi untuk Memuat Daftar ke Wadah (Drawer) di Header
-    function loadFavoritesToDrawer() {
-        const container = document.getElementById('favorites-container');
-        if (!container) return;
+// Kirim data ke database MySQL
+    fetch('/guest/favorite/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ content_id: parseInt(id) }) // <-- Ubah id menjadi integer dengan parseInt()
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Berhasil
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
 
-        let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
 
-        if (favorites.length === 0) {
-            container.innerHTML = `
-                <p class="text-xs text-gray-400 text-center py-10 italic">
-                    Belum ada konten yang ditandai sebagai favorit.
-                </p>`;
-            return;
-        }
+// 4. Fungsi untuk Memuat Daftar ke Wadah (Drawer)
+        function loadFavoritesToDrawer() {
+            const container = document.getElementById('favorites-container');
+            if (!container) return;
 
-        let html = '';
-        favorites.forEach(fav => {
-            html += `
-                <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50/50 transition">
-                    <a href="${fav.url}" class="text-xs font-semibold text-gray-700 hover:text-amber-600 line-clamp-1 flex-1">
-                        ${fav.title}
-                    </a>
-                    <button onclick="removeFavorite('${fav.id}')" class="text-gray-300 hover:text-red-500 p-1 ml-2 text-xs font-bold">
-                        ✕
-                    </button>
-                </div>`;
-        });
-        container.innerHTML = html;
-    }
+            let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
 
-    // 4. Fungsi Hapus Item Langsung dari Wadah Drawer
-    function removeFavorite(id) {
-        let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
-        favorites = favorites.filter(fav => fav.id !== id);
-        localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
-
-        loadFavoritesToDrawer();
-        updateButtonStates();
-    }
-
-    // 5. Menyesuaikan Status Tombol saat Halaman Dibuka
-    function updateButtonStates() {
-        const buttons = document.querySelectorAll('.favorite-btn');
-        let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
-
-        buttons.forEach(button => {
-            const id = button.getAttribute('data-id');
-            const isFav = favorites.some(fav => fav.id === id);
-
-            if (isFav) {
-                button.classList.add('text-amber-500', 'bg-amber-50', 'border-amber-200');
-                button.querySelector('svg').setAttribute('fill', 'currentColor');
-            } else {
-                button.classList.remove('text-amber-500', 'bg-amber-50', 'border-amber-200');
-                button.querySelector('svg').setAttribute('fill', 'none');
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <p class="text-xs text-gray-400 text-center py-10 italic">
+                        Belum ada konten yang ditandai sebagai favorit.
+                    </p>`;
+                return;
             }
+
+            let html = '';
+            favorites.forEach(fav => {
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50/50 transition">
+                        <a href="${fav.url}" class="text-xs font-semibold text-gray-700 hover:text-amber-600 line-clamp-1 flex-1">
+                            ${fav.title}
+                        </a>
+                        <button onclick="removeFavorite('${fav.id}')" class="text-gray-300 hover:text-red-500 p-1 ml-2 text-xs font-bold cursor-pointer">
+                            ✕
+                        </button>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // 5. Fungsi Hapus Item dari Drawer
+        function removeFavorite(id) {
+            let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+            favorites = favorites.filter(fav => fav.id !== id);
+            localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
+
+            loadFavoritesToDrawer();
+            updateButtonStates();
+        }
+
+        // 6. Menyesuaikan Status Tombol
+        function updateButtonStates() {
+            const buttons = document.querySelectorAll('.favorite-btn');
+            let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+
+            buttons.forEach(button => {
+                const id = button.getAttribute('data-id');
+                const isFav = favorites.some(fav => fav.id === id);
+
+                if (isFav) {
+                    button.classList.add('text-amber-500', 'bg-amber-50', 'border-amber-200');
+                    button.querySelector('svg').setAttribute('fill', 'currentColor');
+                } else {
+                    button.classList.remove('text-amber-500', 'bg-amber-50', 'border-amber-200');
+                    button.querySelector('svg').setAttribute('fill', 'none');
+                }
+            });
+        }
+
+        // 7. Dark Mode Logic
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                updateThemeIcons('light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                updateThemeIcons('dark');
+            }
+        }
+
+        function updateThemeIcons(theme) {
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            
+            if (!lightIcon || !darkIcon) return;
+
+            if (theme === 'dark') {
+                darkIcon.classList.remove('hidden');
+                lightIcon.classList.add('hidden');
+            } else {
+                lightIcon.classList.remove('hidden');
+                darkIcon.classList.add('hidden');
+            }
+        }
+
+        // 8. Drawer Toggle untuk Favorit
+        function toggleFavoritesDrawer() {
+            const drawer = document.getElementById('favoritesDrawer');
+            if (drawer) {
+                drawer.classList.toggle('hidden');
+            }
+        }
+
+        // Inisialisasi Saat Halaman Dimuat (Hanya 1 blok DOMContentLoaded yang bersih)
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentTheme = localStorage.getItem('theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            if (currentTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeIcons(currentTheme);
+
+            loadFavoritesToDrawer();
+            updateButtonStates();
         });
-    }
-
-    // Jalankan saat halaman content dimuat
-    document.addEventListener("DOMContentLoaded", function () {
-        loadFavoritesToDrawer();
-        updateButtonStates(); // <-- Pastikan status tombol langsung terdeteksi warna emasnya saat halaman dibuka
-    });
-    function toggleLangDropdown(event) {
-        event.stopPropagation();
-        const dropdown = document.getElementById('boxDropdownLang');
-        dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
-    }
-
-    window.addEventListener('click', function(e) {
-        const dropdown = document.getElementById('boxDropdownLang');
-        const button = document.getElementById('btnDropdownLang');
-        if (dropdown && button && !button.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.style.display = 'none';
-        }
-    });
-
-    function toggleDarkMode() {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-            updateThemeIcons('light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-            updateThemeIcons('dark');
-        }
-    }
-
-    function updateThemeIcons(theme) {
-        const lightIcon = document.getElementById('theme-toggle-light-icon');
-        const darkIcon = document.getElementById('theme-toggle-dark-icon');
-        
-        if (!lightIcon || !darkIcon) return;
-
-        if (theme === 'dark') {
-            darkIcon.classList.remove('hidden');
-            lightIcon.classList.add('hidden');
-        } else {
-            lightIcon.classList.remove('hidden');
-            darkIcon.classList.add('hidden');
-        }
-    }
-
-    // Inisialisasi status tema saat halaman pertama kali dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentTheme = localStorage.getItem('theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        
-        if (currentTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        
-        updateThemeIcons(currentTheme);
-    });
-        </script>
+    </script>
+    
 </body>
 </html>
