@@ -28,8 +28,8 @@
 
 <body class="bg-slate-100 font-[Poppins]">
 
-<div class="min-h-screen flex">
-
+<div class="flex min-h-screen bg-slate-100" x-data="{ sidebarOpen: true }">
+    
     {{-- Sidebar --}}
     @include('admin.layouts.sidebar')
 
@@ -39,7 +39,7 @@
         {{-- Navbar --}}
         @include('admin.layouts.navbar')
 
-        <main class="flex-1 p-8">
+        <main class="flex-1 overflow-x-hidden p-6">
 
             @yield('content')
 

@@ -1,4 +1,7 @@
-<aside class="w-72 min-h-screen bg-slate-900 text-white flex flex-col shadow-xl">
+<aside x-show="sidebarOpen" 
+       x-transition:enter="transition duration-300 ease-in-out" 
+       x-transition:leave="transition duration-300 ease-in-out"
+       class="w-64 bg-[#0B132B] text-white sticky top-0 h-screen overflow-y-auto flex-shrink-0 z-40 flex flex-col">
 
     <!-- Logo -->
 <!-- ===========================
@@ -9,7 +12,7 @@
     <div class="flex flex-col items-center">
 
         <!-- Logo -->
-        <div class="w-15 h-15 rounded-full bg-white border-[3px] border-yellow-400 shadow-lg flex items-center justify-center overflow-hidden">
+        <div class="w-13 h-13 rounded-full bg-white border-[3px] border-yellow-400 shadow-lg flex items-center justify-center overflow-hidden">
 
             <img
                 src="{{ asset('images/logo.png') }}"
@@ -19,21 +22,7 @@
 
         </div>
 
-        <!-- Nama Hotel -->
-        <h2 class="mt-4 text-xl font-bold tracking-wide text-white text-center">
-            M Bahalap Hotel
-        </h2>
 
-        <!-- Bintang -->
-        <div class="flex items-center gap-1 mt-2">
-
-            <i class="bi bi-star-fill text-yellow-400 text-sm"></i>
-            <i class="bi bi-star-fill text-yellow-400 text-sm"></i>
-            <i class="bi bi-star-fill text-yellow-400 text-sm"></i>
-            <i class="bi bi-star-fill text-yellow-400 text-sm"></i>
-            <i class="bi bi-star-fill text-yellow-400 text-sm"></i>
-
-        </div>
 
         <!-- Sub Title -->
         <p class="mt-3 text-xs tracking-widest uppercase text-slate-400">
@@ -78,6 +67,18 @@
     <i class="bi bi-translate"></i>
     Bahasa
 </a>
+  
+
+<!-- Bagian bawah sidebar -->
+<div class="mt-auto border-t border-gray-700 pt-4">
+    <!-- Link Mode Admin / Lihat Website -->
+    <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+        <i class="bi bi-eye"></i> 
+        <span>Lihat Website</span>
+    </a>
+    
+@if(auth()->user()->role == 'super_admin')
+
 <a href="{{ route('admin.settings.index') }}"
    class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition">
 
@@ -94,17 +95,7 @@
     Activity Log
 
 </a>
-  
 
-<!-- Bagian bawah sidebar -->
-<div class="mt-auto border-t border-gray-700 pt-4">
-    <!-- Link Mode Admin / Lihat Website -->
-    <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
-        <i class="bi bi-eye"></i> 
-        <span>Lihat Website</span>
-    </a>
-    
-@if(auth()->user()->role == 'super_admin')
     <a href="{{ route('admin.users.index') }}"
        class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 transition {{ request()->routeIs('admin.users.*') ? 'bg-slate-800' : '' }}">
         
@@ -113,6 +104,7 @@
         User
         
     </a>
+
 @endif
 </div>
 

@@ -8,13 +8,19 @@
 <div class="bg-white rounded-2xl shadow-md">
 
     <!-- Judul Halaman -->
-    <div class="border-b p-6">
+    <div class="border-b p-6 flex justify-between items-center">
+        <div>
         <h2 class="text-2xl font-bold">
             Edit Kategori
         </h2>
         <p class="text-sm text-gray-500 mt-1">
             Perbarui data kategori beserta seluruh terjemahannya.
         </p>
+        </div>
+        <a href="{{ route('admin.categories.index') }}" class="px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+
     </div>
 
     @if (session('error'))
@@ -88,7 +94,7 @@
                 </div>
             </div>
 
-            <hr class="border-gray-200">
+            <hr>
 
             <!-- ========================================================= -->
             <!-- BAGIAN 2: TERJEMAHAN MULTI-BAHASA -->
@@ -99,7 +105,7 @@
                     <div class="flex items-center gap-2">
                         <span class="text-xl">🌐</span>
                         <h3 class="font-bold text-lg text-gray-800">
-                            Terjemahan
+                            Terjemahan Category
                         </h3>
                     </div>
 
@@ -126,9 +132,48 @@
                         <!-- Kotak Pembungkus Bahasa memakai 'border' murni agar hitam tegas sesuai halaman Create -->
                         <div class="border rounded-2xl p-6 bg-white space-y-4">
                             
-                            <div class="font-bold text-gray-900 text-base">
-                                <span class="uppercase">{{ $language->code }}</span> {{ $language->name }}
-                            </div>
+<div class="font-bold text-gray-900 text-base">
+
+    @if($language->code == 'id')
+        Indonesia
+    @elseif($language->code == 'en')
+        English
+    @elseif(in_array($language->code, ['da','dk']))
+        Dayak Ngaju
+    @else
+        {{ $language->name }}
+    @endif
+@if(in_array($language->code, ['da','dk']))
+
+<div class="mt-3 mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4">
+
+    <div class="flex items-start gap-3">
+
+        <i class="bi bi-exclamation-triangle-fill text-amber-600 text-lg mt-0.5"></i>
+
+        <div>
+
+            <p class="font-semibold text-amber-700">
+
+                Perhatian Bahasa Dayak Ngaju
+
+            </p>
+
+            <p class="text-sm text-amber-700 mt-1">
+
+                Hasil terjemahan AI Bahasa Dayak Ngaju masih bersifat bantuan awal.
+                Mohon periksa dan sesuaikan kembali apabila terdapat kata atau kalimat yang kurang tepat sebelum memperbarui data.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
+</div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Input Nama -->
@@ -163,23 +208,29 @@
         </div>
 
         <!-- Tombol Aksi Bawah -->
-        <div class="border-t p-6 flex justify-end gap-3 bg-gray-50 rounded-b-2xl">
-            <a
-                href="{{ route('admin.categories.index') }}"
-                class="px-6 py-3 border border-gray-300 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition"
-            >
-                Batal
-            </a>
+<div class="border-t p-6 bg-gray-50 rounded-b-2xl">
 
-            <button
-                type="submit"
-                onclick="this.form.submit(); this.disabled=true; this.innerText='Memproses...';"
-                class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-medium shadow-sm transition"
-            >
-                Update
-            </button>
-        </div>
+    <div class="text-right mb-3">
 
+        <p
+            id="form-warning-edit"
+            class="text-sm text-red-600 font-medium">
+
+            ⚠ Lengkapi seluruh data kategori sebelum memperbarui.
+
+        </p>
+
+    </div>
+
+
+    <div class="flex justify-end items-center gap-3">
+
+            <a href="{{ route('admin.categories.index') }}" class="px-5 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition font-medium">Batal</a>
+            <button type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Update </button>
+
+    </div>
+
+</div>
     </form>
 </div>
 
@@ -269,6 +320,79 @@
             btnTranslate.innerHTML = `<span>✨</span> <span>Terjemahkan AI</span>`;
         });
     }
+
+    // ========================================
+// Validasi Form Edit
+// ========================================
+
+const updateButton = document.getElementById('btn-update');
+const warning = document.getElementById('form-warning-edit');
+
+function checkFormEdit() {
+
+    let complete = true;
+
+    document.querySelectorAll('.translation-name').forEach(input => {
+
+        if (input.value.trim() === '') {
+            complete = false;
+        }
+
+    });
+
+    if (complete) {
+
+        updateButton.disabled = false;
+
+        updateButton.classList.remove(
+            'bg-gray-400',
+            'cursor-not-allowed'
+        );
+
+        updateButton.classList.add(
+            'bg-yellow-500',
+            'hover:bg-yellow-600'
+        );
+
+        warning.innerHTML =
+            '✅ Semua data telah lengkap dan siap diperbarui.';
+
+        warning.classList.remove('text-red-600');
+        warning.classList.add('text-green-600');
+
+    } else {
+
+        updateButton.disabled = true;
+
+        updateButton.classList.remove(
+            'bg-yellow-500',
+            'hover:bg-yellow-600'
+        );
+
+        updateButton.classList.add(
+            'bg-gray-400',
+            'cursor-not-allowed'
+        );
+
+        warning.innerHTML =
+            '⚠ Lengkapi seluruh data kategori sebelum memperbarui.';
+
+        warning.classList.remove('text-green-600');
+        warning.classList.add('text-red-600');
+
+    }
+
+}
+
+document
+    .querySelectorAll('.translation-name')
+    .forEach(input => {
+
+        input.addEventListener('input', checkFormEdit);
+
+    });
+
+checkFormEdit();
 })();
 </script>
 @endpush

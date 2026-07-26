@@ -12,6 +12,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\ProfileUserController;
 
 
 /*
@@ -83,13 +84,11 @@ Route::middleware('auth')->group(function () {
             Route::delete('/media/{id}/force-delete', [MediaController::class, 'forceDelete'])->name('media.forceDelete');
             Route::get('/media/create', [MediaController::class, 'create'])->name('media.create');
 
-            // 🛠️ DIPERBAIK: Menggunakan Class yang sudah di-import dan menghapus Route::resource yang duplikat
-            Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
-            Route::post('settings/translate', [SettingController::class, 'translate'])->name('settings.translate');
-            Route::get('/switch-language/{lang_code}', [App\Http\Controllers\HomeController::class, 'switchLanguage'])->name('lang.switch');
 
 
+            // Route Pengaturan Akun / Profil Pengguna
+            Route::get('/profile', [ProfileUserController::class, 'edit'])->name('profile.edit');
+            Route::put('/profile', [ProfileUserController::class, 'update'])->name('profile.update');
         // --- Fitur Terbatas untuk Super Admin saja ---
         Route::middleware('role:super_admin')->group(function () {
             Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -99,6 +98,12 @@ Route::middleware('auth')->group(function () {
             Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
             Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+                        // 🛠️ DIPERBAIK: Menggunakan Class yang sudah di-import dan menghapus Route::resource yang duplikat
+            Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::post('settings/translate', [SettingController::class, 'translate'])->name('settings.translate');
+            Route::get('/switch-language/{lang_code}', [App\Http\Controllers\HomeController::class, 'switchLanguage'])->name('lang.switch');
 
             Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 

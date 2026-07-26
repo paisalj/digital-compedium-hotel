@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'provider' => env('AI_PROVIDER', 'gemini'),
+    'provider' => env('AI_PROVIDER', 'groq'),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,27 +28,11 @@ return [
 
     'translation' => [
 
-        /*
-        | Maksimal karakter sekali request.
-        */
-
         'max_characters' => 10000,
-
-        /*
-        | Batch Translation
-        */
 
         'batch_size' => 20,
 
-        /*
-        | Cache hasil translate
-        */
-
         'cache' => true,
-
-        /*
-        | Lama cache (menit)
-        */
 
         'cache_minutes' => 43200, // 30 hari
 
@@ -78,7 +62,7 @@ return [
 
         'api_key' => env('GEMINI_API_KEY'),
 
-        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
 
         'base_url' => env(
             'GEMINI_BASE_URL',
@@ -98,6 +82,22 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
 
         'model' => env('OPENAI_MODEL', 'gpt-5'),
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Groq (TAMBAHKAN INI)
+    |--------------------------------------------------------------------------
+    */
+
+    'groq' => [
+
+        'api_key' => env('GROQ_API_KEY'),
+
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
 
     ],
 

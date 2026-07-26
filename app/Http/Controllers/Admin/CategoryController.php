@@ -34,19 +34,47 @@ class CategoryController extends Controller
         $this->translator = $translator;
     }
 
-        public function index()
-    {
-        $categories = Category::query()
-            ->with('translations.language')
-            ->orderBy('sort_order')
-            ->paginate(10);
+public function index(Request $request)
+{
+    $query = Category::query()
+        ->with(['translations.language'])
+        ->withCount('contents');
 
-        return view(
-            'admin.categories.index',
-            compact('categories')
-        );
+    // Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->whereHas('translations', function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+        });
     }
 
+    // Filter Status
+    if ($request->status !== null && $request->status !== '') {
+        $query->where('is_active', $request->status);
+    }
+
+    $categories = $query
+        ->orderBy('sort_order')
+        ->paginate(10)
+        ->withQueryString();
+
+    // Statistik
+    $statistics = [
+        'total' => Category::count(),
+        'active' => Category::where('is_active', true)->count(),
+        'inactive' => Category::where('is_active', false)->count(),
+        'contents' => \App\Models\Content::count(),
+    ];
+
+    return view(
+        'admin.categories.index',
+        compact(
+            'categories',
+            'statistics'
+        )
+    );
+}
 
 public function updateOrder(Request $request)
 {
@@ -437,46 +465,101 @@ public function update(UpdateCategoryRequest $request, Category $category)
 
     }
 
-    public function trash()
-    {
-        $categories = Category::onlyTrashed()
+public function trash(Request $request)
+{
+    $query = Category::onlyTrashed();
 
-            ->orderByDesc('deleted_at')
+    // ==========================
+    // Search
+    // ==========================
+    if ($request->filled('search')) {
 
-            ->paginate(10);
+        $query->where(function ($q) use ($request) {
 
-        return view(
+            $q->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('slug', 'like', '%' . $request->search . '%');
 
-            'admin.categories.trash',
-
-            compact('categories')
-
-        );
-    }
-
-    public function restore(
-        int $id
-    )
-    {
-        $category = Category::onlyTrashed()
-
-            ->findOrFail($id);
-
-        $category->restore();
-
-        return redirect()
-
-            ->route('admin.categories.trash')
-
-            ->with(
-
-                'success',
-
-                'Kategori berhasil dipulihkan.'
-
-            );
+        });
 
     }
+
+    // ==========================
+    // Filter waktu
+    // ==========================
+    if ($request->filled('filter')) {
+
+        switch ($request->filter) {
+
+            case 'today':
+                $query->whereDate('deleted_at', today());
+                break;
+
+            case 'week':
+                $query->whereBetween('deleted_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]);
+                break;
+
+            case 'month':
+                $query->whereMonth('deleted_at', now()->month)
+                      ->whereYear('deleted_at', now()->year);
+                break;
+
+        }
+
+    }
+
+$categories = $query
+    ->latest('deleted_at')
+    ->paginate(10)
+    ->withQueryString();
+
+    $categories->getCollection()->transform(function ($category) {
+
+$days = floor($category->deleted_at->diffInDays(now()));
+
+$remaining = max(0, 30 - (int) $days);
+    $category->remaining_days = $remaining;
+
+    return $category;
+
+});
+    // Statistik
+    $totalDeleted = Category::onlyTrashed()->count();
+
+    $deletedToday = Category::onlyTrashed()
+        ->whereDate('deleted_at', today())
+        ->count();
+
+    $deletedThisWeek = Category::onlyTrashed()
+        ->whereBetween('deleted_at', [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ])
+        ->count();
+
+    $waitingRestore = Category::onlyTrashed()->count();
+
+    return view('admin.categories.trash', compact(
+        'categories',
+        'totalDeleted',
+        'deletedToday',
+        'deletedThisWeek',
+        'waitingRestore'
+    ));
+}
+
+public function restore($id)
+{
+    $category = Category::onlyTrashed()->findOrFail($id);
+
+    $category->restore();
+
+    return redirect()
+        ->route('admin.categories.index')
+        ->with('success', 'Kategori berhasil direstore.');
+}
 
     public function forceDelete(
         int $id
@@ -517,111 +600,57 @@ public function update(UpdateCategoryRequest $request, Category $category)
     }
 
 public function translate(\Illuminate\Http\Request $request)
-{
-    \Illuminate\Support\Facades\Log::info("=========================================");
-    \Illuminate\Support\Facades\Log::info("[AI TRANSLATE] Memulai proses terjemahan untuk: '" . $request->text . "'");
+    {
+        \Illuminate\Support\Facades\Log::info("=========================================");
+        \Illuminate\Support\Facades\Log::info("[AI TRANSLATE] Memulai proses terjemahan untuk: '" . $request->text . "'");
 
-    try {
-        $sourceText = $request->text;
-        
-        $defaultLanguage = \App\Models\Language::where('is_default', true)->first();
-        $fromCode = $defaultLanguage ? $defaultLanguage->code : 'id';
+        try {
+            $sourceText = $request->text;
+            
+            $defaultLanguage = \App\Models\Language::where('is_default', true)->first();
+            $fromCode = $defaultLanguage ? $defaultLanguage->code : 'id';
 
-        $targetLanguages = \App\Models\Language::where('is_default', false)
-            ->where('is_active', true)
-            ->get();
+            $targetLanguages = \App\Models\Language::where('is_default', false)
+                ->where('is_active', true)
+                ->get();
 
-        // 1. Ambil semua API Key AI yang aktif dari database Anda
-        // Silakan ganti \App\Models\AiApiKey sesuaikan dengan nama Model API Key Anda
-$apiKeys = \App\Models\AiApiKey::where('is_active', 1)
-    ->orderBy('id', 'asc')
-    ->get();
-        if ($apiKeys->isEmpty()) {
+            $results = [];
+
+            // Looping bahasa target menggunakan TranslationService (Groq)
+            foreach ($targetLanguages as $lang) {
+                $translated = $this->translator->translate(
+                    new TranslationRequest(
+                        text: $sourceText,
+                        from: $fromCode,
+                        to: $lang->code
+                    )
+                );
+
+                if (!isset($translated->translatedText) || empty($translated->translatedText)) {
+                    throw new \Exception("Gagal menerjemahkan ke bahasa {$lang->code}");
+                }
+
+                $finalText = $translated->translatedText;
+
+                $results[$lang->id] = [
+                    'name' => $finalText,
+                    'slug' => \Illuminate\Support\Str::slug($finalText),
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Terjemahan AI berhasil!',
+                'translations' => $results
+            ]);
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("[AI TRANSLATE ERROR] Gagal Total: " . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada API Key AI aktif yang dikonfigurasi di database.'
+                'message' => 'Gagal menerjemahkan: ' . $e->getMessage(),
             ], 500);
         }
-
-        $results = [];
-
-        // Loop untuk setiap bahasa target
-        foreach ($targetLanguages as $lang) {
-            $finalText = null;
-            $successWithKey = false;
-
-            // 2. LOOP ROTASI: Coba setiap API Key yang ada di database sampai berhasil
-            foreach ($apiKeys as $index => $apiKey) {
-                \Illuminate\Support\Facades\Log::info("[AI KEY MANAGER] Mencoba Kunci Ke-" . ($index + 1) . " untuk bahasa {$lang->code}");
-
-                try {
-                    // Inject atau set API Key yang sedang aktif ke dalam translator service
-                    // (Asumsi: service Anda mendukung penggantian key secara dinamis/runtime)
-                    if (method_exists($this->translator, 'setApiKey')) {
-                        $this->translator->setApiKey($apiKey->key);
-                    } else {
-                        // Jika key dikirim via properti publik di service Anda
-                        $this->translator->apiKey = $apiKey->key;
-                    }
-
-                    $translatedName = $this->translator->translate(
-                        new TranslationRequest(
-                            text: $sourceText,
-                            from: $fromCode,
-                            to: $lang->code
-                        )
-                    );
-
-                    // Cek jika ada error dari service AI
-                    $isError = isset($translatedName->error) || (isset($translatedName->success) && !$translatedName->success);
-                    
-                    if (!$isError) {
-                        // Ambil teks hasil terjemahan jika sukses
-                        $finalText = $translatedName->translatedText 
-                                     ?? $translatedName->text 
-                                     ?? (is_string($translatedName) ? $translatedName : null);
-                        
-                        if ($finalText) {
-                            $successWithKey = true;
-                            \Illuminate\Support\Facades\Log::info("[AI TRANSLATE] ---> Kunci Ke-" . ($index + 1) . " BERHASIL: '{$finalText}'");
-                            break; // 🔥 Sukses! Keluar dari loop kunci, lanjut ke bahasa berikutnya
-                        }
-                    }
-
-                    \Illuminate\Support\Facades\Log::warning("[AI TRANSLATE] Kunci Ke-" . ($index + 1) . " memberikan respon error. Mencoba kunci cadangan berikutnya...");
-
-                } catch (\Throwable $keyException) {
-                    \Illuminate\Support\Facades\Log::error("[AI TRANSLATE] Kunci Ke-" . ($index + 1) . " Gagal/Crash: " . $keyException->getMessage());
-                    // 🔄 Lanjut ke kunci cadangan berikutnya di database
-                    continue; 
-                }
-            }
-
-            // 3. Jika setelah memutar semua kunci tetap gagal menerjemahkan bahasa ini
-            if (!$successWithKey || is_null($finalText)) {
-                throw new \Exception("Semua kuota cadangan API Key AI Anda telah habis atau sedang sibuk.");
-            }
-            
-            $results[$lang->id] = [
-                'name' => $finalText,
-                'slug' => \Illuminate\Support\Str::slug($finalText),
-            ];
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Terjemahan AI berhasil diterapkan menggunakan sistem rotasi!',
-            'translations' => $results
-        ]);
-
-    } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::error("[AI TRANSLATE ERROR] Gagal Total: " . $e->getMessage());
-        
-        return response()->json([
-            'success' => false,
-            'message' => 'Token semua kunci telah habis, akan di reset dalam waktu 10-15 menit jangan di klik terjemahan nya.',
-        ], 500);
     }
-}
-
 }

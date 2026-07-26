@@ -465,18 +465,20 @@
         }
 
         let html = '';
-        favorites.forEach(fav => {
-            html += `
-                <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50/50 transition">
-                    <a href="${fav.url}" class="text-xs font-semibold text-gray-700 hover:text-amber-600 line-clamp-1 flex-1">
-                        ${fav.title}
-                    </a>
-                    <button type="button" onclick="removeFavoriteFromCategory('${fav.id}')" class="text-gray-300 hover:text-red-500 p-1 ml-2 text-xs font-bold cursor-pointer">
-                        ✕
-                    </button>
-                </div>`;
-        });
-        container.innerHTML = html;
+favorites.forEach(fav => {
+    html += `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm transition">
+            <a href="${fav.url}" class="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-amber-500 truncate">
+                ${fav.title}
+            </a>
+            <button onclick="removeFavorite('${fav.id}')" class="text-slate-400 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 p-1">
+                &times;
+            </button>
+        </div>
+    `;
+});
+
+container.innerHTML = html;
     }
 
     function removeFavoriteFromCategory(id) {

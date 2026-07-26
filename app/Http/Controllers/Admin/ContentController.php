@@ -198,7 +198,6 @@ public function translate(Request $request)
 
     try {
         // 1. EKSTRAKSI GAMBAR (Penting agar tidak dikirim ke AI)
-        // Kita simpan gambar ke dalam array sementara, dan ganti dengan placeholder di body
         $images = [];
         $body = $request->body;
         
@@ -215,7 +214,7 @@ public function translate(Request $request)
         $translations = [];
 
         foreach ($languages as $lang) {
-            // 2. KIRIM KE AI (Hanya teks dan placeholder gambar)
+            // 2. KIRIM KE AI
             $result = $this->translator->translate(
                 new TranslationRequest(
                     text: json_encode([
@@ -227,8 +226,18 @@ public function translate(Request $request)
                 )
             );
 
-            $decoded = json_decode($result->translatedText ?? '[]', true);
-            $translatedBody = $decoded['body'] ?? $bodyWithPlaceholders;
+            $rawText = trim($result->translatedText ?? '');
+
+            // 🧹 BERSIHKAN MARKDOWN (Antisipasi jika AI mengirim bungkus ```json ... ```)
+            $rawText = preg_replace('/^```json\s*|\s*```$/i', '', $rawText);
+            $rawText = trim($rawText, " \t\n\r\0\x0B`");
+
+            // Decode JSON dari AI
+            $decoded = json_decode($rawText, true);
+
+            // Ambil hasil terjemahan, jika gagal decode gunakan teks asli sebagai cadangan aman
+            $translatedTitle = (is_array($decoded) && isset($decoded['title'])) ? $decoded['title'] : $request->title;
+            $translatedBody  = (is_array($decoded) && isset($decoded['body'])) ? $decoded['body'] : $bodyWithPlaceholders;
 
             // 3. KEMBALIKAN GAMBAR (Replace placeholder dengan tag img asli)
             foreach ($images as $id => $originalImgTag) {
@@ -236,7 +245,7 @@ public function translate(Request $request)
             }
 
             $translations[$lang->id] = [
-                'title' => $decoded['title'] ?? 'Token habis, pakai menual dulu',
+                'title' => $translatedTitle,
                 'body'  => $translatedBody
             ];
         }
@@ -250,10 +259,11 @@ public function translate(Request $request)
         Log::error("[CONTENT TRANSLATE ERROR]: " . $e->getMessage());
         return response()->json([
             'success' => false, 
-            'message' => 'Terjadi kesalahan saat memproses tabel atau gambar.'
+            'message' => 'Terjadi kesalahan saat memproses terjemahan: ' . $e->getMessage()
         ], 500);
     }
 }
+
 public function updateOrder(Request $request)
 {
     // 1. Validasi data yang masuk wajib berupa array isi angka

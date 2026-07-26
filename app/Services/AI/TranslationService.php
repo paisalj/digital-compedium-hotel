@@ -10,7 +10,8 @@ use App\Services\AI\DTO\TranslationRequest;
 use App\Services\AI\DTO\TranslationResult;
 use App\Services\AI\Prompts\TranslationPrompt;
 use App\Services\AI\Providers\GeminiProvider;
-use Illuminate\Support\Facades\Cache; // <--- 1. TAMBAHKAN INI UNTUK CACHING
+use App\Services\AI\Providers\GroqProvider;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Translation Service.
@@ -36,12 +37,10 @@ class TranslationService
      */
     protected function resolveProvider(): TranslationProvider
     {
-        return match (config('ai.provider')) {
-
+        return match (config('ai.provider', 'groq')) {
+            'groq' => new GroqProvider(),
             'gemini' => new GeminiProvider(),
-
-            default => new GeminiProvider(),
-
+            default => new GroqProvider(),
         };
     }
 
@@ -54,20 +53,21 @@ class TranslationService
         TranslationRequest $request
     ): TranslationResult {
 
-        // 2. UBAH BAGIAN INI: Membuat key unik berdasarkan teks dan bahasa target
+        $provider = $this->provider ?? $this->resolveProvider();
+
+        // Membuat key unik berdasarkan teks dan bahasa target
         $cacheKey = "ai_trans_" . md5(strtolower(trim($request->text))) . "_{$request->from}_{$request->to}";
 
-        // Menyimpan hasil di memori selama 30 hari (60 detik * 60 menit * 24 jam * 30 hari)
-        return Cache::remember($cacheKey, 60 * 60 * 24 * 30, function () use ($request) {
+        // Menyimpan hasil di memori selama 30 hari
+        return Cache::remember($cacheKey, 60 * 60 * 24 * 30, function () use ($request, $provider) {
             
-            // Kode asli Anda dipindahkan ke dalam fungsi penampung ini
             $prompt = TranslationPrompt::build(
                 $request->text,
                 $request->from,
                 $request->to
             );
 
-            return $this->provider->translate(
+            return $provider->translate(
                 $prompt,
                 $request->from,
                 $request->to

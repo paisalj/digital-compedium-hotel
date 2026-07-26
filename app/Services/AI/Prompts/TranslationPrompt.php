@@ -1,17 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Services\AI\Prompts;
 
-/**
- * Builds translation prompts for AI providers.
- */
 class TranslationPrompt
 {
-    /**
-     * Build translation prompt.
-     */
     public static function build(
         string $text,
         string $from,
@@ -21,36 +13,169 @@ class TranslationPrompt
         $languageNames = [
             'id' => 'Indonesian',
             'en' => 'English',
+            'da' => 'Dayak Ngaju',
             'dk' => 'Dayak Ngaju',
         ];
 
         $fromName = $languageNames[$from] ?? $from;
-        $toName = $languageNames[$to] ?? $to;
 
-        return <<<PROMPT
-Anda adalah seorang ahli bahasa profesional yang spesialis dalam konten industri perhotelan dan pariwisata.
+        $isJsonPayload = (json_decode($text, true) !== null);
 
-PENTING UNTUK BAHASA DAERAH (DAYAK NGAJU):
-- Gunakan bahasa yang lazim digunakan sehari-hari oleh masyarakat setempat (Dayak Ngaju), namun tetap menjaga kesantunan dan profesionalisme khas perhotelan.
-- JANGAN terjemahkan nama orang (seperti Jokowi), nama merek, atau singkatan resmi (seperti MBG).
-- Jika ada istilah teknis hotel (seperti 'room service', 'amenities', 'check-in'), terjemahkan ke padanan yang paling dimengerti atau tetap gunakan istilah tersebut jika sudah lazim digunakan.
-- Jika ada struktur tabel, pertahankan integritas datanya.
+        /*
+        |--------------------------------------------------------------------------
+        | JSON Translation
+        |--------------------------------------------------------------------------
+        */
 
-Rules:
-- Terjemahkan dengan akurat ke target: {$toName}.
-- Pertahankan makna asli, gaya bahasa, dan terminologi industri hospitality.
-- JANGAN berikan penjelasan atau catatan.
-- JANGAN gunakan tanda kutip di awal/akhir atau format Markdown (seperti bold/code).
-- Kembalikan HANYA teks terjemahannya saja.
+        if ($isJsonPayload) {
 
-Source Language:
-{$fromName} ({$from})
+            if ($to === 'en') {
 
-Target Language:
-{$toName} ({$to})
+                return implode("\n", [
 
-Text to translate:
-{$text}
-PROMPT;
+                    "You are a strict JSON translation API for a CMS.",
+
+                    "Translate the 'title' and 'body' values inside the given JSON object from {$fromName} to English.",
+
+                    "RULES:",
+
+                    "1. Return ONLY a valid raw JSON object with exact keys \"title\" and \"body\".",
+
+                    "2. PRESERVE ALL HTML TAGS exactly as they are.",
+
+                    "3. DO NOT translate room names, hotel names, numbers or proper nouns.",
+
+                    "4. DO NOT wrap the JSON inside markdown.",
+
+                    "",
+
+                    $text
+
+                ]);
+            }
+
+            if (in_array($to, ['da', 'dk'])) {
+
+                return implode("\n", [
+
+                    "Anda adalah API penerjemah JSON profesional.",
+
+                    "Terjemahkan nilai JSON berikut ke Bahasa Dayak Ngaju.",
+
+                    "",
+
+                    "ATURAN:",
+
+                    "1. Output HARUS berupa JSON murni.",
+
+                    "2. Jangan mengubah struktur JSON.",
+
+                    "3. Pertahankan seluruh tag HTML.",
+
+                    "4. Jangan menerjemahkan nama hotel, nama ruangan, angka maupun proper noun.",
+
+                    "5. Jangan menambahkan penjelasan.",
+
+                    "",
+
+                    $text
+
+                ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Normal Translation - English
+        |--------------------------------------------------------------------------
+        */
+
+        if ($to === 'en') {
+
+            return implode("\n", [
+
+                "You are a professional translator.",
+
+                "Translate the following Indonesian text into English.",
+
+                "",
+
+                "RULES:",
+
+                "- Return ONLY the translated text.",
+
+                "- No explanations.",
+
+                "- No quotation marks.",
+
+                "- Preserve HTML tags.",
+
+                "- Preserve hotel names, room names, numbers and proper nouns.",
+
+                "",
+
+                "TEXT:",
+
+                $text
+
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Normal Translation - Dayak Ngaju
+        |--------------------------------------------------------------------------
+        */
+
+        if (in_array($to, ['da', 'dk'])) {
+
+            return implode("\n", [
+
+                "You are a professional translator of Dayak Ngaju (Central Kalimantan, Indonesia).",
+
+                "",
+
+                "Translate the following Indonesian text into natural Dayak Ngaju.",
+
+                "",
+
+                "RULES:",
+
+                "- Return ONLY the translated text.",
+
+                "- No explanations.",
+
+                "- No quotation marks.",
+
+                "- No markdown.",
+
+                "- Preserve HTML tags.",
+
+                "- Preserve hotel names, room names, numbers and proper nouns.",
+
+                "- If there is no proper Dayak Ngaju equivalent, keep the Indonesian word instead of translating into English.",
+
+                "",
+
+                "TEXT:",
+
+                $text
+
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default
+        |--------------------------------------------------------------------------
+        */
+
+        return implode("\n", [
+
+            "Translate the following text.",
+
+            $text
+
+        ]);
     }
 }
