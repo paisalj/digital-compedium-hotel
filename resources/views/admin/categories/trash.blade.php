@@ -178,9 +178,14 @@
 @endif
 
 </form>
+<div class="w-full overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+
 <table class="w-full border-collapse">
 <thead class="bg-slate-300 border-b border-slate-400">
                         <tr>
+    <th class="text-center py-4 font-semibold text-gray-700 uppercase tracking-wide text-sm">
+        No
+    </th>
 
 <th class="text-center py-4 font-semibold text-gray-700 uppercase tracking-wide text-sm">Icon</th>
 <th class="text-left py-4 font-semibold text-gray-700 uppercase tracking-wide text-sm">Nama</th>
@@ -202,6 +207,11 @@
                 @foreach($categories as $category)
 
 <tr class="border-b odd:bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition">
+
+<td class="py-4 pl-4 font-medium">
+    {{ $categories->firstItem() + $loop->index }}
+</td>
+
 
                             <td class="text-center py-4">
 
@@ -342,7 +352,7 @@
                                     <button
                                         class="px-4 py-2 bg-red-600 text-white rounded-lg">
 
-                                        Hapus Permanen
+                                        Hapus
 
                                     </button>
 

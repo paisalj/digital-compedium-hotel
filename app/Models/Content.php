@@ -16,11 +16,10 @@ class Content extends Model
     protected $fillable = ['category_id', 'icon', 'sort_order', 'is_active'];
 
     // Relasi ke tabel Kategori
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
+public function category()
+{
+    return $this->belongsTo(Category::class)->withTrashed();
+}
     public function favorites()
     {
         return $this->hasMany(GuestFavorite::class, 'content_id'); 

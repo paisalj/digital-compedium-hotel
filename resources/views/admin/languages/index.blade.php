@@ -6,24 +6,23 @@
 
 @section('content')
 
-<div class="space-y-6">
+<div class="-m-6 p-6 bg-slate-100 min-h-screen">
 
+    <div class="bg-slate-100 border border-slate-300 rounded-2xl shadow-md p-6">
+
+        <div class="space-y-6">
     {{-- Header --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
         <div>
 
-            <h2 class="text-3xl font-bold flex items-center gap-3">
+<h2 class="text-2xl font-bold">
+    🌐 Bahasa
+</h2>
 
-                🌐 Bahasa
-
-            </h2>
-
-            <p class="text-gray-500 mt-2">
-
-                Kelola seluruh bahasa yang digunakan sistem.
-
-            </p>
+<p class="text-gray-500">
+    Kelola seluruh bahasa yang digunakan sistem.
+</p>
 
         </div>
 
@@ -31,8 +30,7 @@
 
             <a
                 href="{{ route('admin.languages.create') }}"
-                class="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-3 rounded-xl shadow transition">
-
+              class="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm"
                 <i class="bi bi-plus-lg"></i>
 
                 Tambah Bahasa
@@ -392,6 +390,8 @@
 
             </a>
 
+        </div>
+        </div>
         </div>
 
     @endforelse

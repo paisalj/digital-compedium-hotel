@@ -121,9 +121,17 @@
                     <select name="category_id" id="category-select" class="w-full border rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm" required>
                         <option value="">-- Pilih Kategori --</option>
                         @foreach($categories as $category)
-                            @php
-                                $catName = $category->translations->where('language.code', app()->getLocale())->first()->name ?? $category->translations->first()->name;
-                            @endphp
+@php
+    $translation = $category->translations->firstWhere(function ($item) {
+        return optional($item->language)->code === app()->getLocale();
+    });
+
+    if (!$translation) {
+        $translation = $category->translations->first();
+    }
+
+    $catName = $translation?->name ?? 'Kategori';
+@endphp
                             <option value="{{ $category->id }}" data-icon="{{ $category->icon }}">
                                 {{ $catName }}
                             </option>
@@ -143,7 +151,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-full">
                     <input
-                        type="text"
+                        type="text"required
                         name="icon"
                         id="content-icon-input"
                         value="{{ old('icon') }}"
@@ -181,14 +189,41 @@
                         <i class="bi bi-stars"></i> Terjemahkan AI
                     </button>
                 </div>
-                    <small class="text-gray-400 mt-1 block">Apa bila token habis bisa isi manual.</small>
 
                 @foreach($languages as $language)
                     <div class="border rounded-xl p-6 mb-6 bg-gray-50">
-                        <h4 class="text-lg font-bold mb-5 flex items-center gap-2">
-                            <span>{{ $language->flag ?? '🌐' }}</span> 
-                            <span>{{ $language->native_name }} ({{ strtoupper($language->code) }})</span>
-                        </h4>
+<h4 class="text-lg font-bold mb-5">
+
+    @switch($language->code)
+
+        @case('id')
+            Indonesia
+        @break
+
+        @case('en')
+            English
+        @break
+
+        @case('da')
+            Dayak Ngaju
+        @break
+
+        @default
+            {{ $language->flag }} {{ $language->native_name }}
+
+    @endswitch
+
+    @if($language->code == 'da')
+    <div class="mb-4">
+        <span class="block rounded-lg bg-amber-100 border border-amber-300 text-amber-800 text-sm px-4 py-3">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong>Catatan:</strong>
+            Periksa kembali hasil terjemahan AI sebelum menyimpan. Dukungan AI untuk Bahasa Dayak Ngaju masih terbatas sehingga hasil terjemahan mungkin belum sepenuhnya sesuai.
+        </span>
+    </div>
+@endif
+
+</h4>
 
                         <div class="grid md:grid-cols-2 gap-5 mb-4">
                             <div>
@@ -234,10 +269,30 @@
 
         </div>
 
-        <div class="border-t p-6 flex justify-end gap-3 bg-gray-50 rounded-b-2xl">
+<div class="border-t bg-slate-50 rounded-b-2xl p-6">
+
+    <div class="text-right mb-3">
+
+    {{-- Pesan Validasi --}}
+<p id="form-warning"
+class="text-sm font-medium text-red-600">
+
+❌ Lengkapi seluruh data terlebih dahulu.
+
+</p>
+</div>
+
+
+
+    {{-- Tombol --}}
+    <div class="flex justify-end items-center gap-3">
+
             <a href="{{ route('admin.contents.index') }}" class="px-5 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition font-medium">Batal</a>
-            <button type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Simpan Konten</button>
-        </div>
+            <button id="saveButton" type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Simpan Konten</button>
+
+    </div>
+
+</div>
     </form>
 
 </div>
@@ -371,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2. MENGATUR MUNCULNYA IKON EMAS SAAT KATEGORI DIPILIH
         categorySelect.addEventListener('change', function() {
+            checkFormValidation();
             const selectedValue = this.value;
             const selectedOption = categorySelect.querySelector(`option[value="${selectedValue}"]`);
             const iconClass = selectedOption ? selectedOption.getAttribute('data-icon') : null;
@@ -392,43 +448,131 @@ const form = document.querySelector('form[action="{{ route("admin.contents.store
         });
     }
     // Inisialisasi TinyMCE Editor
-    tinymce.init({
-        selector: '.tinymce-editor',
-        height: 350,
-        menubar: false,
-        plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount'
-        ],
-        toolbar: 'undo redo | blocks | ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'table image media | removeformat | help',
-        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: #374151; }',
-        automatic_uploads: true,
-        file_picker_types: 'image',
-file_picker_callback: (cb, value, meta) => {
-        if (meta.filetype === 'image') {
-            openMediaModal(cb); 
+tinymce.init({
+    selector: '.tinymce-editor',
+    height: 350,
+    menubar: false,
+
+    plugins: [
+        'advlist',
+        'autolink',
+        'lists',
+        'link',
+        'image',
+        'table'
+    ],
+
+    toolbar:
+        'undo redo | bold italic | image table',
+
+    file_picker_callback: function(cb, value, meta){
+
+        if(meta.filetype === 'image'){
+            openMediaModal(cb);
         }
+
+    },
+
+    setup: function(editor){
+
+        editor.on('keyup change', function(){
+
+            checkFormValidation();
+
+        });
+
     }
+
 });
+// ========================================
+// Validasi Form Live
+// ========================================
 
-    // Otomatis isi Slug Indonesia saat mengetik Judul Indonesia
-    const indoTitle = document.querySelector('[data-language="id"]');
-    const indoSlug = document.querySelector('[data-slug="id"]');
+const saveButton = document.getElementById('saveButton');
+const warning = document.getElementById('form-warning');
 
-    if (indoTitle && indoSlug) {
-        indoTitle.addEventListener('input', function() {
-            indoSlug.value = this.value
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w-]/g, '');
+function checkFormValidation(){
+
+    let valid = true;
+
+    // kategori
+    if(categorySelect.value==""){
+        valid=false;
+    }
+
+    // semua judul
+    document.querySelectorAll('[data-language]').forEach(function(input){
+
+        if(input.value.trim()==""){
+            valid=false;
+        }
+
+    });
+
+    // semua editor TinyMCE
+// semua editor TinyMCE (diubah agar aman dari undefined)
+    if (typeof tinymce !== 'undefined' && tinymce.editors) {
+        tinymce.editors.forEach(function(editor){
+            if(editor.getContent({format:'text'}).trim()==""){
+                valid=false;
+            }
         });
     }
+        if(valid){
 
+        warning.innerHTML="✅ Semua data telah lengkap dan siap disimpan.";
+        warning.classList.remove("text-red-600");
+        warning.classList.add("text-green-600");
+
+        saveButton.disabled=false;
+
+        saveButton.classList.remove(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
+
+    }else{
+
+        warning.innerHTML="❌ Lengkapi seluruh data terlebih dahulu.";
+
+        warning.classList.remove("text-green-600");
+        warning.classList.add("text-red-600");
+
+        saveButton.disabled=true;
+
+        saveButton.classList.add(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
+
+    }
+
+}
+    // Otomatis isi Slug Indonesia saat mengetik Judul Indonesia
+// ===========================
+// Auto Generate Slug Semua Bahasa
+// ===========================
+
+document.querySelectorAll('[data-language]').forEach(function(titleInput){
+
+    const lang = titleInput.dataset.language;
+    const slugInput = document.querySelector(`[data-slug="${lang}"]`);
+
+    if(!slugInput) return;
+
+    titleInput.addEventListener('input', function(){
+
+        slugInput.value = this.value
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g,'-')
+            .replace(/[^\w\-]/g,'');
+
+        checkFormValidation();
+
+    });
+
+});
     // Fitur Terjemahan AI otomatis untuk Judul & Deskripsi (TinyMCE)
     const btnTranslate = document.getElementById('translate-ai');
     if (btnTranslate) {
@@ -529,6 +673,7 @@ file_picker_callback: (cb, value, meta) => {
                         
                         if (editorInstance) {
                             editorInstance.setContent(translatedBody);
+                            checkFormValidation();
                         } else {
                             const bodyTextarea = document.getElementById('body_' + langId);
                             if (bodyTextarea) bodyTextarea.value = translatedBody;
@@ -561,6 +706,7 @@ file_picker_callback: (cb, value, meta) => {
             btnTranslate.innerHTML = `<i class="bi bi-stars"></i> Terjemahkan AI`;
         }
     }
+    checkFormValidation();
 });
 </script>
 @endpush

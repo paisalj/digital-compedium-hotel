@@ -28,35 +28,62 @@ class ContentController extends Controller
 public function index(Request $request)
 {
     $categories = Category::with('translations')->get();
-    
-// 1. Cek Apakah Baris Ini Sudah Ada? (Untuk mengambil data bahasa)
-    $languages = \App\Models\Language::all();
-
+    $languages = Language::all();
 
     $selectedCategory = $request->get('category_id');
     $search = $request->get('search');
 
-    $contents = Content::query()
-        ->with(['translations.language', 'category.translations'])
-        ->when($selectedCategory, function ($query) use ($selectedCategory) {
-            return $query->where('category_id', $selectedCategory);
-        })
-        ->when($search, function ($query) use ($search) {
-            return $query->whereHas('translations', function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%');
-            });
-        })
-        ->orderBy('sort_order', 'asc') 
-        ->paginate(10)
-        ->withQueryString(); 
+$status = $request->status;
 
-    // 👈 TAMBAHKAN 'languages' ke dalam compact()
-    return view('admin.contents.index', compact('contents', 'categories', 'selectedCategory', 'languages'));
+$contents = Content::query()
+    ->with(['translations.language', 'category.translations'])
+
+    ->when($selectedCategory, function ($query) use ($selectedCategory) {
+        $query->where('category_id', $selectedCategory);
+    })
+
+    ->when($search, function ($query) use ($search) {
+        $query->whereHas('translations', function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%");
+        });
+    })
+
+    ->when($status !== null && $status !== '', function ($query) use ($status) {
+        $query->where('is_active', $status);
+    })
+
+    ->orderBy('sort_order')
+    ->paginate(10)
+    ->withQueryString();
+    // ==========================
+    // Statistik
+    // ==========================
+
+    $totalContents = Content::count();
+
+    $activeContents = Content::where('is_active', true)->count();
+
+    $inactiveContents = Content::where('is_active', false)->count();
+
+    $trashContents = Content::onlyTrashed()->count();
+
+    return view('admin.contents.index', compact(
+        'contents',
+        'categories',
+        'languages',
+        'selectedCategory',
+
+        'totalContents',
+        'activeContents',
+        'inactiveContents',
+        'trashContents'
+    ));
 }
-
 public function create()
     {
-        $categories = Category::with('translations')->get();
+$categories = Category::with([
+    'translations.language'
+])->get();
         $languages = Language::where('is_active', true)->get();
 
 $media = \App\Models\Media::all();
@@ -117,7 +144,9 @@ public function store(Request $request)
 public function edit(string $id)
 {
     $content = Content::findOrFail($id);
-    $categories = Category::with('translations')->get();
+$categories = Category::with([
+    'translations.language'
+])->get();
     $languages = Language::where('is_active', true)->get();
 
     // Jalur penuh sudah benar agar tidak error class not found
@@ -283,12 +312,91 @@ public function updateOrder(Request $request)
     return redirect()->route('admin.contents.index')->with('success', 'Susunan urutan konten berhasil diperbarui!');
 }
 
-public function trash()
+public function trash(Request $request)
 {
-    // Mengambil data konten yang berstatus soft-deleted
-    $contents = Content::onlyTrashed()->get();
     
-    return view('admin.contents.trash', compact('contents'));
+    $query = Content::onlyTrashed()
+        ->with([
+            'translations.language',
+            'category.translations'
+        ]);
+
+    // Search
+    if ($request->filled('search')) {
+
+        $query->whereHas('translations', function ($q) use ($request) {
+
+            $q->where('title', 'like', '%' . $request->search . '%');
+
+        });
+
+    }
+
+    // Filter
+    if ($request->filled('filter')) {
+
+        switch ($request->filter) {
+
+            case 'today':
+                $query->whereDate('deleted_at', today());
+                break;
+
+case 'week':
+    $startWeek = now()->copy()->startOfWeek();
+    $endWeek   = now()->copy()->endOfWeek();
+
+    $query->whereBetween('deleted_at', [
+        $startWeek,
+        $endWeek
+    ]);
+    break;
+    
+            case 'month':
+                $query->whereMonth('deleted_at', now()->month)
+                      ->whereYear('deleted_at', now()->year);
+                break;
+
+        }
+
+    }
+
+    $contents = $query
+        ->latest('deleted_at')
+        ->paginate(10)
+        ->withQueryString();
+
+    $contents->getCollection()->transform(function ($content) {
+
+$daysPassed = $content->deleted_at
+    ->startOfDay()
+    ->diffInDays(now()->startOfDay());
+
+$content->remaining_days = max(0, 30 - $daysPassed);
+
+        return $content;
+
+    });
+
+    // Statistik
+    $totalDeleted = Content::onlyTrashed()->count();
+
+    $deletedToday = Content::onlyTrashed()
+        ->whereDate('deleted_at', today())
+        ->count();
+
+$deletedThisWeek = Content::onlyTrashed()
+    ->where('deleted_at', '>=', now()->subDays(7))
+    ->count();
+
+    $waitingRestore = Content::onlyTrashed()->count();
+
+    return view('admin.contents.trash', compact(
+        'contents',
+        'totalDeleted',
+        'deletedToday',
+        'deletedThisWeek',
+        'waitingRestore'
+    ));
 }
 public function restore($id)
 {

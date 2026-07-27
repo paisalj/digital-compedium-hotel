@@ -4,108 +4,320 @@
 @section('page-title', 'Konten')
 
 @section('content')
-<div class="bg-white rounded-2xl shadow-md p-6">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800">Manajemen Konten</h2>
-            <p class="text-gray-500">Kelola konten</p>
-        </div>
+<div class="bg-white rounded-2xl shadow-md p-6 w-full overflow-hidden">
+    <div class="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-        <div class="flex flex-wrap items-center gap-2">
-<button type="submit" form="form-urut-konten" class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl font-medium inline-flex items-center gap-2 shadow-sm transition text-sm">
-    <i class="bi bi-arrow-down-up"></i> Simpan Susunan Urutan
-</button>
-            <a href="{{ route('admin.contents.create') }}"
-               class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl inline-flex items-center gap-2 shadow-sm transition font-medium text-sm">
-                <i class="bi bi-plus-circle"></i> + Tambah Konten
-            </a>
-            <a href="{{ route('admin.contents.trash') }}" class="px-5 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm">
-                <i class="bi bi-trash3"></i> Recycle Bin
-            </a>
-        </div>
+    <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold text-gray-800">
+            Manajemen Konten
+        </h2>
+
+        <p class="text-gray-500">
+            Kelola konten
+        </p>
     </div>
 
-    <div class="mb-6 bg-gray-50 p-3 rounded-xl border border-gray-100">
-        <span class="text-xs font-semibold text-gray-400 block mb-2 uppercase tracking-wider pl-1">Filter Kategori:</span>
-<div class="flex flex-nowrap overflow-x-auto gap-2 pb-2 shadow-inner" style="-webkit-overflow-scrolling: touch;">
-    <a href="{{ route('admin.contents.index') }}" 
-       class="shrink-0 px-4 py-2 text-xs font-medium rounded-xl transition {{ !$selectedCategory ? 'bg-gray-800 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-        Semua Konten
-    </a>
-    @foreach($categories as $cat)
-        @php
-            $catName = $cat->translations->where('language.code', app()->getLocale())->first()->name ?? $cat->translations->first()->name ?? 'Kategori ' . $cat->id;
-        @endphp
-        <a href="{{ route('admin.contents.index', ['category_id' => $cat->id]) }}" 
-           class="shrink-0 px-4 py-2 text-xs font-medium rounded-xl transition {{ $selectedCategory == $cat->id ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-            {{ $catName }}
-        </a>
-    @endforeach
-</div>
-    </div>
-<div class="mb-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-    <form action="{{ route('admin.contents.index') }}" method="GET" class="w-full sm:w-auto flex gap-2">
-        @if($selectedCategory)
-            <input type="hidden" name="category_id" value="{{ $selectedCategory }}">
-        @endif
-        
-        <div class="relative w-full sm:w-72">
-            <input type="text" 
-                   name="search" 
-                   value="{{ request('search') }}" 
-                   placeholder="Cari judul konten..." 
-                   class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50/50 transition"
-            >
-            <i class="bi bi-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-        </div>
-        
-        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
-            Cari
+    <div class="flex flex-wrap justify-start lg:justify-end gap-2 shrink-0">
+
+        <button
+            type="submit"
+            form="form-urut-konten"
+            class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap">
+
+            <i class="bi bi-arrow-down-up"></i>
+            Simpan Susunan Urutan
+
         </button>
 
-        @if(request('search'))
-            <a href="{{ route('admin.contents.index', $selectedCategory ? ['category_id' => $selectedCategory] : []) }}" 
-               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center">
-                Reset
-            </a>
-        @endif
-    </form>
+        <a
+            href="{{ route('admin.contents.create') }}"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap">
 
-    @if(request('search'))
-        <div class="text-sm text-gray-500 w-full sm:w-auto text-left sm:text-right">
-            Menampilkan hasil untuk: <span class="font-semibold text-gray-800">"{{ request('search') }}"</span>
-        </div>
-    @endif
+            <i class="bi bi-plus-circle"></i>
+            Tambah Konten
+
+        </a>
+
+        <a
+            href="{{ route('admin.contents.trash') }}"
+            class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap">
+
+            <i class="bi bi-trash3"></i>
+            Recycle Bin
+
+        </a>
+
+    </div>
+
 </div>
-    @if (session('success'))
-        <div class="mb-6 p-4 text-sm text-green-700 bg-green-100 border border-green-200 rounded-xl flex items-center gap-2">
-            <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+    {{-- Total Konten --}}
+    <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-file-earmark-text text-blue-600"></i>
+            <p class="text-sm text-blue-600 font-medium">Total Konten</p>
         </div>
+
+        <h2 class="text-3xl font-bold text-blue-700">
+            {{ $totalContents }}
+        </h2>
+    </div>
+
+    {{-- Aktif --}}
+    <div class="bg-green-50 border border-green-100 rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-check-circle-fill text-green-600"></i>
+            <p class="text-sm text-green-600 font-medium">Konten Aktif</p>
+        </div>
+
+        <h2 class="text-3xl font-bold text-green-700">
+            {{ $activeContents }}
+        </h2>
+    </div>
+
+    {{-- Nonaktif --}}
+    <div class="bg-red-50 border border-red-100 rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-x-circle-fill text-red-600"></i>
+            <p class="text-sm text-red-600 font-medium">Nonaktif</p>
+        </div>
+
+        <h2 class="text-3xl font-bold text-red-700">
+            {{ $inactiveContents }}
+        </h2>
+    </div>
+
+    {{-- Recycle Bin --}}
+    <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-trash3-fill text-yellow-600"></i>
+            <p class="text-sm text-yellow-600 font-medium">Recycle Bin</p>
+        </div>
+
+        <h2 class="text-3xl font-bold text-yellow-700">
+            {{ $trashContents }}
+        </h2>
+    </div>
+
+</div>
+
+<div class="mb-6 bg-gray-50 p-3 rounded-xl border border-gray-100">
+
+    <span class="text-xs font-semibold text-gray-400 block mb-2 uppercase tracking-wider">
+        Filter Kategori
+    </span>
+
+    <div class="flex flex-wrap gap-2">
+
+        <a href="{{ route('admin.contents.index') }}"
+           class="px-4 py-2 rounded-xl text-xs font-medium
+           {{ !$selectedCategory
+                ? 'bg-gray-800 text-white'
+                : 'bg-white border border-gray-200 hover:bg-gray-100' }}">
+            Semua Konten
+        </a>
+
+        @foreach($categories as $cat)
+
+            @php
+                $catName = $cat->translations
+                    ->where('language.code', app()->getLocale())
+                    ->first()->name
+                    ?? $cat->translations->first()->name
+                    ?? 'Kategori '.$cat->id;
+            @endphp
+
+            <a href="{{ route('admin.contents.index',['category_id'=>$cat->id]) }}"
+               class="px-4 py-2 rounded-xl text-xs font-medium
+               {{ $selectedCategory==$cat->id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white border border-gray-200 hover:bg-gray-100' }}">
+                {{ $catName }}
+            </a>
+
+        @endforeach
+
+    </div>
+
+</div>
+
+{{-- =========================
+     SEARCH + FILTER
+========================= --}}
+<form
+    action="{{ route('admin.contents.index') }}"
+    method="GET"
+    class="flex flex-col md:flex-row gap-3 mb-6">
+
+    {{-- Pertahankan filter kategori --}}
+    @if($selectedCategory)
+        <input
+            type="hidden"
+            name="category_id"
+            value="{{ $selectedCategory }}">
     @endif
 
-    @if (session('error'))
-        <div class="mb-6 p-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-xl flex items-center gap-2">
-            <i class="bi bi-exclamation-triangle-fill"></i> {{ session('error') }}
-        </div>
+    {{-- Search --}}
+    <div class="flex-1">
+        <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            placeholder="🔍 Cari judul konten..."
+            class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500">
+    </div>
+
+    {{-- Status --}}
+    <select
+        name="status"
+        class="border rounded-xl px-4 py-3 min-w-[170px]">
+
+        <option value="">Semua Status</option>
+
+        <option value="1"
+            @selected(request('status') == '1')>
+            Aktif
+        </option>
+
+        <option value="0"
+            @selected(request('status') == '0')>
+            Nonaktif
+        </option>
+
+    </select>
+
+    {{-- Cari --}}
+    <button
+        type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl">
+
+        Cari
+
+    </button>
+
+    {{-- Reset --}}
+    @if(request()->filled('search') || request()->filled('status'))
+        <a
+            href="{{ route('admin.contents.index', $selectedCategory ? ['category_id'=>$selectedCategory] : []) }}"
+            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 rounded-xl flex items-center justify-center">
+
+            Reset
+
+        </a>
     @endif
 
+</form>
+
+@if(
+    request()->filled('search') ||
+    request()->filled('status') ||
+    $selectedCategory
+)
+
+@php
+    $selectedCategoryData = $categories->firstWhere('id', $selectedCategory);
+
+    $selectedCategoryName = $selectedCategoryData
+        ? (
+            $selectedCategoryData->translations
+                ->where('language.code', app()->getLocale())
+                ->first()->name
+            ?? $selectedCategoryData->translations->first()->name
+            ?? '-'
+        )
+        : null;
+@endphp
+
+<div class="mb-6 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4">
+
+    <div class="flex items-start gap-3">
+
+        <div class="mt-0.5">
+            <i class="bi bi-info-circle-fill text-blue-600 text-xl"></i>
+        </div>
+
+        <div class="flex-1">
+
+            <h3 class="font-semibold text-blue-800 mb-2">
+                Ringkasan Filter
+            </h3>
+
+            <div class="flex flex-wrap gap-2">
+
+                <span class="px-3 py-1 rounded-full bg-white border text-sm">
+                    📄
+                    Total :
+                    <strong>{{ $contents->total() }}</strong>
+                </span>
+
+                @if($selectedCategory)
+
+                    <span class="px-3 py-1 rounded-full bg-white border text-sm">
+                        📂
+                        {{ $selectedCategoryName }}
+                    </span>
+
+                @endif
+
+                @if(request()->filled('status'))
+
+                    <span
+                        class="px-3 py-1 rounded-full border text-sm
+                        {{ request('status')=='1'
+                            ? 'bg-green-100 text-green-700 border-green-200'
+                            : 'bg-red-100 text-red-700 border-red-200' }}">
+
+                        {{ request('status')=='1'
+                            ? '✅ Aktif'
+                            : '❌ Nonaktif' }}
+
+                    </span>
+
+                @endif
+
+                @if(request()->filled('search'))
+
+                    <span class="px-3 py-1 rounded-full bg-white border text-sm">
+
+                        🔍 "{{ request('search') }}"
+
+                    </span>
+
+                @endif
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
     @if($contents->count())
-        <div class="overflow-x-auto border border-gray-100 rounded-xl shadow-sm">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50/70 border-b border-gray-100">
-                    <tr>
-                        <th class="py-3.5 pl-4 font-semibold text-gray-600 text-sm w-12">No</th>
+<div class="w-full overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+<table class="min-w-full border-separate border-spacing-0">
+    
+           <thead class="bg-slate-300 border-b border-slate-400">                       
+             <tr>
+                        <th class="px-4 py-4 text-sm font-semibold text-gray-700">No</th>
                         <th class="py-3.5 px-6 font-semibold text-gray-600 text-sm w-24">Icon</th>
-                        <th class="py-3.5 font-semibold text-gray-600 text-sm">Judul Konten</th> 
+                        <th class="text-left py-3.5 font-semibold text-gray-600 text-sm">Judul Konten</th> 
                         <th class="py-3.5 font-semibold text-gray-600 text-sm">Kategori</th>
                         <th class="py-3.5 font-semibold text-gray-600 text-sm w-28 text-center">Urutan</th>   
-                        <th class="py-3.5 font-semibold text-gray-600 text-sm w-28 text-center">Status</th>   
+                        <th class="py-3.5 font-semibold text-gray-600 text-sm w-28 text-center">Status</th>  
+                        <th class="py-3.5 font-semibold text-gray-600 text-sm w-44 text-center">
+    Terakhir Diubah
+</th> 
                         <th class="py-3.5 font-semibold text-gray-600 text-sm w-44 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @foreach($contents as $content)
-                        <tr class="hover:bg-gray-50/80 transition">
+<tr class="border-b odd:bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition">
                             <td class="py-4 pl-4 text-sm font-medium text-gray-500">
                                 {{ ($contents->currentPage() - 1) * $contents->perPage() + $loop->iteration }}
                             </td>
@@ -148,12 +360,15 @@
     </div>
 </td>
                             {{-- 🌐 Mengambil nama kategori sesuai bahasa aktif --}}
-                            <td class="py-4 text-sm text-gray-600 font-medium">
-                                <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-md border border-gray-200/50">
-                                    {{ $content->category->translations->where('language.code', app()->getLocale())->first()->name ?? $content->category->translations->first()->name ?? '-' }}
-                                </span>
-                            </td>
+<td class="py-4">
+    <span
+        class="inline-flex items-center max-w-[180px] px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold truncate"
+        title="{{ $content->category->translations->where('language.code', app()->getLocale())->first()->name ?? $content->category->translations->first()->name ?? '-' }}">
 
+        {{ $content->category->translations->where('language.code', app()->getLocale())->first()->name ?? $content->category->translations->first()->name ?? '-' }}
+
+    </span>
+</td>
                             <td class="py-4 text-center">
                                 <input 
                                     type="number" 
@@ -177,26 +392,83 @@
                                 @endif
                             </td>                    
                             
-                            <td class="py-4 text-center text-sm">
-                                <div class="flex items-center justify-center gap-2 font-medium">
-                                    @php
-                                        $currentTitle = $content->translations->where('language.code', app()->getLocale())->first()->title ?? $content->translations->first()->title ?? 'Konten';
-                                    @endphp
+<td class="py-4 text-left whitespace-nowrap">
 
-                                    <a href="{{ route('admin.contents.edit', $content) }}" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded-lg transition flex items-center gap-1">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-                                    <span class="text-gray-200">|</span>
+    <div class="flex items-center justify-center gap-2">
 
-                                    <form action="{{ route('admin.contents.destroy', $content) }}" method="POST" class="inline content-delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" onclick="konfirmasiHapusKonten(this, '{{ addslashes($currentTitle) }}')" class="text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded-lg transition flex items-center gap-1">
-                                            <i class="bi bi-trash"></i> Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+        <i class="bi bi-clock-history text-gray-400"></i>
+
+        <div class="text-left">
+
+            <div class="text-sm font-medium text-gray-700">
+                {{ $content->updated_at->format('d M Y') }}
+            </div>
+
+            <div class="text-xs text-gray-400">
+                {{ $content->updated_at->diffForHumans() }}
+            </div>
+
+        </div>
+
+    </div>
+
+</td>
+                            
+<td class="text-center">
+
+    @php
+        $currentName = $content->translations
+            ->where('language.code', app()->getLocale())
+            ->first()->name
+            ?? $content->translations->first()->name
+            ?? 'Konten';
+    @endphp
+
+    <div class="flex items-center justify-center gap-2">
+
+        {{-- Tombol Edit --}}
+        <a
+            href="{{ route('admin.contents.edit', $content) }}"
+            title="Edit Konten"
+            class="w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200
+                   text-blue-600 hover:text-blue-700
+                   flex items-center justify-center
+                   transition duration-200">
+
+            <i class="bi bi-pencil-square"></i>
+
+        </a>
+
+        {{-- Tombol Hapus --}}
+        <form
+            action="{{ route('admin.contents.destroy', $content) }}"
+            method="POST"
+            class="inline content-delete-form">
+
+            @csrf
+            @method('DELETE')
+
+            <button
+                type="button"
+                title="Pindahkan ke Recycle Bin"
+                onclick="konfirmasiHapusKonten(this, '{{ addslashes($currentName) }}')"
+                class="w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200
+                       text-red-600 hover:text-red-700
+                       flex items-center justify-center
+                       transition duration-200">
+
+                <i class="bi bi-trash"></i>
+
+            </button>
+
+        </form>
+
+    </div>
+
+</td>
+
+
+
                         </tr>
                     @endforeach
                 </tbody>

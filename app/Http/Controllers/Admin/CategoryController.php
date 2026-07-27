@@ -495,12 +495,10 @@ public function trash(Request $request)
                 break;
 
             case 'week':
-                $query->whereBetween('deleted_at', [
-                    now()->startOfWeek(),
-                    now()->endOfWeek()
-                ]);
-                break;
-
+$deletedThisWeek = Category::onlyTrashed()
+    ->where('deleted_at', '>=', now()->copy()->subDays(7))
+    ->count();
+    
             case 'month':
                 $query->whereMonth('deleted_at', now()->month)
                       ->whereYear('deleted_at', now()->year);
@@ -532,12 +530,9 @@ $remaining = max(0, 30 - (int) $days);
         ->whereDate('deleted_at', today())
         ->count();
 
-    $deletedThisWeek = Category::onlyTrashed()
-        ->whereBetween('deleted_at', [
-            now()->startOfWeek(),
-            now()->endOfWeek()
-        ])
-        ->count();
+$deletedThisWeek = Category::onlyTrashed()
+    ->where('deleted_at', '>=', now()->subDays(7))
+    ->count();
 
     $waitingRestore = Category::onlyTrashed()->count();
 

@@ -43,38 +43,57 @@
 
     </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 
+    {{-- Total Kategori --}}
     <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
-        <p class="text-sm text-blue-600 font-medium">Total Kategori</p>
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-folder2-open text-blue-600 text-lg"></i>
+            <p class="text-sm text-blue-600 font-medium">Total Kategori</p>
+        </div>
+
         <h2 class="text-3xl font-bold text-blue-700">
             {{ $statistics['total'] }}
         </h2>
     </div>
 
+    {{-- Aktif --}}
     <div class="bg-green-50 border border-green-100 rounded-xl p-5">
-        <p class="text-sm text-green-600 font-medium">Kategori Aktif</p>
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-check-circle-fill text-green-600 text-lg"></i>
+            <p class="text-sm text-green-600 font-medium">Kategori Aktif</p>
+        </div>
+
         <h2 class="text-3xl font-bold text-green-700">
             {{ $statistics['active'] }}
         </h2>
     </div>
 
+    {{-- Nonaktif --}}
     <div class="bg-red-50 border border-red-100 rounded-xl p-5">
-        <p class="text-sm text-red-600 font-medium">Nonaktif</p>
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-x-circle-fill text-red-600 text-lg"></i>
+            <p class="text-sm text-red-600 font-medium">Nonaktif</p>
+        </div>
+
         <h2 class="text-3xl font-bold text-red-700">
             {{ $statistics['inactive'] }}
         </h2>
     </div>
 
+    {{-- Total Konten --}}
     <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-5">
-        <p class="text-sm text-yellow-600 font-medium">Total Konten</p>
+        <div class="flex items-center gap-2 mb-2">
+            <i class="bi bi-file-earmark-text-fill text-yellow-600 text-lg"></i>
+            <p class="text-sm text-yellow-600 font-medium">Total Konten</p>
+        </div>
+
         <h2 class="text-3xl font-bold text-yellow-700">
             {{ $statistics['contents'] }}
         </h2>
     </div>
 
 </div>
-
 
 
     <!-- Alert Notifikasi Sukses / Gagal -->
@@ -139,11 +158,11 @@
     @endif
 
 </form>
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="border-b">
+<div class="w-full overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+<table class="min-w-full border-separate border-spacing-0">
+            <thead class="bg-slate-300 border-b border-slate-400">
                 <tr>
-                    <th class="text-left py-3 w-12">No</th>
+                    <th class="px-3 py-3 text-sm font-semibold text-gray-500">No</th>
                     <th class="text-left">Icon</th>
                     <th class="text-left">Nama</th>
                     <th class="text-left">Slug</th>
@@ -154,8 +173,8 @@
             </thead>
             <tbody>
                 @foreach($categories as $category)
-<tr class="border-b hover:bg-gray-50 transition">
-    <td class="py-4 font-medium">
+<tr class="border-b odd:bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition">
+             <td class="py-4 px-4 text-sm font-semibold text-gray-500">
         {{ $loop->iteration }}
     </td>
 <td>

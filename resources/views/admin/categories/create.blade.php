@@ -53,7 +53,7 @@
                     <div>
                         <label class="block mb-2 font-medium">Icon</label>
                         <input
-                            type="text"required
+                            type="text" required
                             name="icon"
                             value="{{ old('icon') }}"
                             class="w-full border rounded-xl px-4 py-3"
@@ -149,7 +149,7 @@ Terjemahan Bahasa Dayak Ngaju dihasilkan oleh AI sebagai bantuan awal.
                             <div>
                                 <label class="block mb-2">Nama</label>
                                 <input
-                                    type="text"required
+                                    type="text" required
                                     name="translations[{{ $language->id }}][name]"
                                     data-language="{{ $language->code }}"
                                     class="w-full border rounded-xl px-4 py-3">
@@ -158,7 +158,7 @@ Terjemahan Bahasa Dayak Ngaju dihasilkan oleh AI sebagai bantuan awal.
                             <div>
                                 <label class="block mb-2">Slug</label>
                                 <input
-                                    type="text"required
+                                    type="text" required
                                     name="translations[{{ $language->id }}][slug]"
                                     data-slug="{{ $language->code }}"
                                     class="w-full border rounded-xl px-4 py-3">
@@ -174,13 +174,12 @@ Terjemahan Bahasa Dayak Ngaju dihasilkan oleh AI sebagai bantuan awal.
     <div class="text-right mb-3">
 
     {{-- Pesan Validasi --}}
-    <p
-        id="form-warning"
-            class="text-sm text-red-600 font-medium">
+<p id="form-warning"
+class="text-sm font-medium text-red-600">
 
-        ⚠ Lengkapi seluruh data kategori sebelum menyimpan.
+❌ Lengkapi seluruh data terlebih dahulu.
 
-    </p>
+</p>
 </div>
 
 
@@ -189,7 +188,7 @@ Terjemahan Bahasa Dayak Ngaju dihasilkan oleh AI sebagai bantuan awal.
     <div class="flex justify-end items-center gap-3">
 
             <a href="{{ route('admin.categories.index') }}" class="px-5 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition font-medium">Batal</a>
-            <button type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Simpan Konten</button>
+            <button type="submit" id="btn-submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Simpan Konten</button>
 
     </div>
 
@@ -297,6 +296,9 @@ Terjemahan Bahasa Dayak Ngaju dihasilkan oleh AI sebagai bantuan awal.
                     }
                 });
 
+                // Panggil validasi form agar pesan langsung berubah hijau
+                checkForm();
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Terjemahan selesai',
@@ -325,109 +327,85 @@ Terjemahan Bahasa Dayak Ngaju dihasilkan oleh AI sebagai bantuan awal.
     }
 
     // =============================
-// Validasi Form
-// =============================
+    // Validasi Form (Diperbarui & Aman)
+    // =============================
+    const form = document.querySelector("form");
+    const submitButton = document.getElementById("btn-submit");
+    const warning = document.getElementById("form-warning");
 
-const form = document.querySelector("form");
+    function checkForm() {
+        // Ambil elemen secara spesifik berdasarkan name untuk menghindari masalah spasi atribut
+        const iconInput = form.querySelector('input[name="icon"]');
+        const nameInputs = form.querySelectorAll('input[name*="[name]"]');
+        const slugInputs = form.querySelectorAll('input[name*="[slug]"]');
 
-const submitButton = document.getElementById("btn-submit");
+        let emptyFields = [];
 
-const warning = document.getElementById("form-warning");
-
-function checkForm() {
-
-    const requiredInputs = form.querySelectorAll("[required]");
-
-    let emptyFields = [];
-
-    requiredInputs.forEach(input => {
-
-        if (input.value.trim() === "") {
-
-            const label =
-                input.previousElementSibling?.innerText ??
-                "Kolom";
-
-            emptyFields.push(label);
-
+        if (iconInput && iconInput.value.trim() === "") {
+            emptyFields.push("Icon");
         }
 
-    });
+        nameInputs.forEach(input => {
+            if (input.value.trim() === "") {
+                emptyFields.push("Nama");
+            }
+        });
 
-    if (emptyFields.length === 0) {
+        slugInputs.forEach(input => {
+            if (input.value.trim() === "") {
+                emptyFields.push("Slug");
+            }
+        });
 
-        submitButton.disabled = false;
-
-        submitButton.classList.remove(
-            "bg-gray-400",
-            "cursor-not-allowed"
-        );
-
-        submitButton.classList.add(
-            "bg-yellow-500",
-            "hover:bg-yellow-600"
-        );
-
-        warning.classList.remove("text-red-600");
-
-        warning.classList.add("text-green-600");
-
-        warning.innerHTML =
-            "✅ Semua data telah lengkap. Silakan simpan kategori.";
-
-    } else {
-
-        submitButton.disabled = true;
-
-        submitButton.classList.remove(
-            "bg-yellow-500",
-            "hover:bg-yellow-600"
-        );
-
-        submitButton.classList.add(
-            "bg-gray-400",
-            "cursor-not-allowed"
-        );
-
-        warning.classList.remove("text-green-600");
-
-        warning.classList.add("text-red-600");
-
-        warning.innerHTML =
-            "⚠ Masih ada <b>" +
-            emptyFields.length +
-            "</b> kolom yang wajib diisi sebelum menyimpan.";
-
+        if (emptyFields.length === 0) {
+            submitButton.disabled = false;
+            submitButton.classList.remove(
+                "bg-gray-400",
+                "cursor-not-allowed"
+            );
+            submitButton.classList.add(
+                "bg-yellow-500",
+                "hover:bg-yellow-600"
+            );
+            warning.classList.remove("text-red-600");
+            warning.classList.add("text-green-600");
+            warning.innerHTML = "✅ Semua data telah lengkap. Silakan simpan kategori.";
+        } else {
+            submitButton.disabled = true;
+            submitButton.classList.remove(
+                "bg-yellow-500",
+                "hover:bg-yellow-600"
+            );
+            submitButton.classList.add(
+                "bg-gray-400",
+                "cursor-not-allowed"
+            );
+            warning.classList.remove("text-green-600");
+            warning.classList.add("text-red-600");
+            warning.innerHTML = "⚠️ Masih ada <b>" + emptyFields.length + "</b> kolom yang wajib diisi sebelum menyimpan.";
+        }
     }
 
-}
+    form.addEventListener("input", checkForm);
+    checkForm();
 
-form.addEventListener("input", checkForm);
+    // ==========================================
+    // Otomatis update slug saat nama diketik
+    // ==========================================
+    document.querySelectorAll('[data-language]').forEach(function(nameInput) {
+        nameInput.addEventListener('input', function() {
+            const lang = this.dataset.language;
+            const slugInput = document.querySelector(`[data-slug="${lang}"]`);
 
-checkForm();
+            if (!slugInput) return;
 
-// ==========================================
-// Otomatis update slug saat nama diketik
-// ==========================================
-
-document.querySelectorAll('[data-language]').forEach(function(nameInput) {
-
-    nameInput.addEventListener('input', function() {
-
-        const lang = this.dataset.language;
-
-        const slugInput = document.querySelector(`[data-slug="${lang}"]`);
-
-        if (!slugInput) return;
-
-        slugInput.value = this.value
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w-]/g, '');
+            slugInput.value = this.value
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]/g, '');
+        });
     });
-
-});
 
 })();
 </script>

@@ -113,9 +113,17 @@
                     <select name="category_id" id="category-select" class="w-full border rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm" required>
                         <option value="">-- Pilih Kategori --</option>
                         @foreach($categories as $category)
-                            @php
-                                $catName = $category->translations->where('language.code', app()->getLocale())->first()->name ?? $category->translations->first()->name;
-                            @endphp
+@php
+    $translation = $category->translations->firstWhere(function ($item) {
+        return optional($item->language)->code === app()->getLocale();
+    });
+
+    if (!$translation) {
+        $translation = $category->translations->first();
+    }
+
+    $catName = $translation?->name ?? 'Kategori';
+@endphp
                             <option value="{{ $category->id }}" data-icon="{{ $category->icon }}" {{ $content->category_id == $category->id ? 'selected' : '' }}>
                                 {{ $catName }}
                             </option>
@@ -165,19 +173,23 @@
             {{-- TRANSLATION SECTIONS --}}
             <hr class="border-gray-100">
 
-            <div>
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold">🌐 Terjemahan Konten</h3>
-
-                    <button
-                        type="button"
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🌐</span>
+                        <h3 class="font-bold text-lg text-gray-800">
+                            Terjemahan konten
+                        </h3>
+                    </div>
+                    <button 
+                        type="button" 
                         id="translate-ai"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition font-medium shadow-sm">
-                        <i class="bi bi-stars"></i> Terjemahkan AI
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium flex items-center gap-2 shadow-sm transition"
+                    >
+                        <span>✨</span>
+                        <span>Terjemahkan AI</span>
                     </button>
-
                 </div>
-                    <small class="text-gray-400 mt-1 block">Apa bila token habis bisa edit manual.</small>
 
                 @foreach($languages as $language)
                     @php
@@ -185,10 +197,48 @@
                         $transData = $content->translations->where('language_id', $language->id)->first();
                     @endphp
                     <div class="border rounded-xl p-6 mb-6 bg-gray-50">
-                        <h4 class="text-lg font-bold mb-5 flex items-center gap-2">
-                            <span>{{ $language->flag ?? '🌐' }}</span> 
-                            <span>{{ $language->native_name }} ({{ strtoupper($language->code) }})</span>
-                        </h4>
+<div class="font-bold text-gray-900 text-base">
+
+    @if($language->code == 'id')
+        Indonesia
+    @elseif($language->code == 'en')
+        English
+    @elseif(in_array($language->code, ['da','dk']))
+        Dayak Ngaju
+    @else
+        {{ $language->name }}
+    @endif
+@if(in_array($language->code, ['da','dk']))
+
+<div class="mt-3 mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4">
+
+    <div class="flex items-start gap-3">
+
+        <i class="bi bi-exclamation-triangle-fill text-amber-600 text-lg mt-0.5"></i>
+
+        <div>
+
+            <p class="font-semibold text-amber-700">
+
+                Perhatian Bahasa Dayak Ngaju
+
+            </p>
+
+            <p class="text-sm text-amber-700 mt-1">
+
+                Hasil terjemahan AI Bahasa Dayak Ngaju masih bersifat bantuan awal.
+                Mohon periksa dan sesuaikan kembali apabila terdapat kata atau kalimat yang kurang tepat sebelum memperbarui data.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
+</div>
 
                         <div class="grid md:grid-cols-2 gap-5 mb-4">
                             <div>
@@ -234,12 +284,35 @@
 
         </div>
 
-        <div class="border-t p-6 flex justify-end gap-3 bg-gray-50 rounded-b-2xl">
-            <a href="{{ route('admin.contents.index') }}" class="px-5 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition font-medium">Batal</a>
-            <button type="submit" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">Update Konten</button>
-        </div>
-    </form>
+        <!-- Tombol Aksi Bawah -->
+<div class="border-t p-6 bg-gray-50 rounded-b-2xl">
 
+    <div class="text-right mb-3">
+
+        <p
+            id="form-warning-edit"
+            class="text-sm text-red-600 font-medium">
+
+            ⚠ Lengkapi seluruh data kategori sebelum memperbarui.
+
+        </p>
+
+    </div>
+
+
+    <div class="flex justify-end items-center gap-3">
+
+            <a href="{{ route('admin.contents.index') }}" class="px-5 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition font-medium">Batal</a>
+<button
+    id="updateButton"
+    type="submit"
+    class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition font-medium shadow-md shadow-blue-100">
+    Update
+</button>
+    </div>
+
+</div>
+    </form>
 </div>
 
 
@@ -445,23 +518,103 @@ document.addEventListener('DOMContentLoaded', function() {
             if (meta.filetype === 'image') {
                 openMediaModal(cb); 
             }
-        }
+        },
+        setup: function(editor){
+
+    editor.on('keyup change', function(){
+
+        checkFormValidation();
+
     });
 
-    // Otomatis isi Slug Indonesia saat mengetik Judul Indonesia
-    const indoTitle = document.querySelector('[data-language="id"]');
-    const indoSlug = document.querySelector('[data-slug="id"]');
+},
+    });
+const updateButton = document.getElementById('updateButton');
+const warning = document.getElementById('form-warning-edit');
 
-    if (indoTitle && indoSlug) {
-        indoTitle.addEventListener('input', function() {
-            indoSlug.value = this.value
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w-]/g, '');
-        });
+function checkFormValidation(){
+
+    let valid = true;
+
+    // kategori
+    if(categorySelect.value==""){
+        valid = false;
     }
 
+    // semua judul
+    document.querySelectorAll('[data-language]').forEach(function(input){
+
+        if(input.value.trim()==""){
+            valid = false;
+        }
+
+    });
+
+    // semua isi editor
+const editors = tinymce.get();
+
+editors.forEach(function(editor){
+
+    if (!editor.initialized) return;
+
+    if(editor.getContent({ format:'text' }).trim()===""){
+        valid = false;
+    }
+
+});
+
+if(valid){
+
+        warning.innerHTML="✅ Semua data telah lengkap dan siap diperbarui.";
+
+        warning.classList.remove("text-red-600");
+        warning.classList.add("text-green-600");
+
+        updateButton.disabled=false;
+
+        updateButton.classList.remove(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
+
+    }else{
+
+        warning.innerHTML="❌ Lengkapi seluruh data terlebih dahulu.";
+
+        warning.classList.remove("text-green-600");
+        warning.classList.add("text-red-600");
+
+        updateButton.disabled=true;
+
+        updateButton.classList.add(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
+
+    }
+
+}
+
+document.querySelectorAll('[data-language]').forEach(function(titleInput){
+
+    const lang = titleInput.dataset.language;
+    const slugInput = document.querySelector(`[data-slug="${lang}"]`);
+
+    if(!slugInput) return;
+
+    titleInput.addEventListener('input',function(){
+
+        slugInput.value = this.value
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g,'-')
+            .replace(/[^\w\-]/g,'');
+
+        checkFormValidation();
+
+    });
+
+});
     // Fitur Terjemahan AI otomatis untuk Judul & Deskripsi (TinyMCE)
     const btnTranslate = document.getElementById('translate-ai');
     if (btnTranslate) {
@@ -556,6 +709,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         if (editorInstance) {
                             editorInstance.setContent(translatedBody);
+                            checkFormValidation();
                         } else {
                             const bodyTextarea = document.getElementById('body_' + langId);
                             if (bodyTextarea) bodyTextarea.value = translatedBody;
