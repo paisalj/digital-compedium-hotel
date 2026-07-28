@@ -64,11 +64,6 @@
                 <!-- Form Logout -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 font-medium text-left">
-                        <i class="bi bi-box-arrow-right text-red-500 text-sm"></i>
-                        <span>Keluar (Logout)</span>
-                    </button>
-                </form>
             </div>
         </div>
 
