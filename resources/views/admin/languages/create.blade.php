@@ -388,7 +388,7 @@
         <button
             id="saveButton"
             type="submit"
-            class="px-5 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl shadow-md transition">
+            class="px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl shadow-md transition">
 
             <i class="bi bi-check-circle mr-2"></i>
 
@@ -404,6 +404,32 @@
 
 </div>
 </div>
+@push('scripts')
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function(){
+
+    const saveButton = document.getElementById('saveButton');
+    const warning = document.getElementById('form-warning-language');
+
+    function checkLanguageForm(){
+
+        // kode...
+
+    }
+
+    document.querySelectorAll('input, select').forEach(function(el){
+
+        el.addEventListener('input', checkLanguageForm);
+        el.addEventListener('change', checkLanguageForm);
+
+    });
+
+    checkLanguageForm();
+
+});
+
 const saveButton=document.getElementById('saveButton');
 
 const warning=document.getElementById('form-warning-language');
@@ -467,4 +493,9 @@ document.querySelectorAll('input,select').forEach(function(el){
 });
 
 checkLanguageForm();
+
+</script>
+
+@endpush
+
 @endsection

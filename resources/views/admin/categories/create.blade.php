@@ -364,8 +364,8 @@ class="text-sm font-medium text-red-600">
                 "cursor-not-allowed"
             );
             submitButton.classList.add(
-                "bg-yellow-500",
-                "hover:bg-yellow-600"
+                "bg-blue-500",
+                "hover:bg-blue-600"
             );
             warning.classList.remove("text-red-600");
             warning.classList.add("text-green-600");
@@ -373,8 +373,8 @@ class="text-sm font-medium text-red-600">
         } else {
             submitButton.disabled = true;
             submitButton.classList.remove(
-                "bg-yellow-500",
-                "hover:bg-yellow-600"
+                "bg-blue-500",
+                "hover:bg-blue-600"
             );
             submitButton.classList.add(
                 "bg-gray-400",
