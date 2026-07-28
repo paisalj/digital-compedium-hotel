@@ -51,6 +51,12 @@
     </div>
 
 </div>
+
+    <!-- FORM LOGOUT TERPISAH (Hidden & Aman dari Konflik Form Halaman Lain) -->
+<form id="global-logout-form" action="{{ route('logout') }}" method="POST" class="hidden" style="display: none;">
+    @csrf
+</form>
+
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 @include('admin.layouts.scripts')

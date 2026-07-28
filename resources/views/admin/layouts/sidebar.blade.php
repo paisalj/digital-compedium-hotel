@@ -3,47 +3,42 @@
        x-transition:leave="transition duration-300 ease-in-out"
        class="w-64 bg-[#0B132B] text-white sticky top-0 h-screen overflow-y-auto flex-shrink-0 z-40 flex flex-col">
 
-    <!-- Logo -->
     <!-- ===========================
-        HOTEL BRAND
+         HOTEL BRAND / LOGO AREA
     =========================== -->
-<!-- ===========================
-    HOTEL BRAND / LOGO AREA
-=========================== -->
-<div class="px-6 py-6 border-b border-slate-700">
-    <div class="flex flex-col items-center text-center">
+    <div class="px-6 py-6 border-b border-slate-700">
+        <div class="flex flex-col items-center text-center">
 
-        <!-- Pembungkus Logo (Menggunakan w-16 h-16 standar Tailwind) -->
-        <div class="w-16 h-16 rounded-full bg-white border-[3px] border-yellow-400 shadow-lg flex items-center justify-center overflow-hidden p-1.5">
-            <img
-                src="{{ asset('images/logo.png') }}"
-                alt="Logo Hotel"
-                class="w-full h-full object-contain"
-            >
+            <!-- Pembungkus Logo -->
+            <div class="w-16 h-16 rounded-full bg-white border-[3px] border-yellow-400 shadow-lg flex items-center justify-center overflow-hidden p-1.5">
+                <img
+                    src="{{ asset('images/logo.png') }}"
+                    alt="Logo Hotel"
+                    class="w-full h-full object-contain"
+                >
+            </div>
+
+            <!-- Teks Branding -->
+            <div class="mt-3">
+                <p class="text-xs font-semibold tracking-widest uppercase text-slate-200">
+                    Digital Compendium
+                </p>
+
+                <p class="text-[10px] tracking-wider text-yellow-400/90 mt-0.5 font-medium">
+                    M Bahalap Hotel
+                </p>
+            </div>
+
         </div>
-
-        <!-- Teks Branding (Satu atau Dua Baris) -->
-        <div class="mt-3">
-            <!-- Pilihan 1: Jika hanya ingin "Digital Compendium" tapi lebih terang -->
-            <p class="text-xs font-semibold tracking-widest uppercase text-slate-200">
-                Digital Compendium
-            </p>
-
-            <!-- Opsional: Tambahkan nama hotel di bawahnya sebagai sub-identitas -->
-            <p class="text-[10px] tracking-wider text-yellow-400/90 mt-0.5 font-medium">
-                M Bahalap Hotel
-            </p>
-        </div>
-
     </div>
-</div>
 
-<!-- Menu -->
+    <!-- Menu -->
     <nav class="flex-1 mt-6 flex flex-col">
 
-    <p class="px-6 mb-3 text-[11px] font-semibold uppercase tracking-[0.30em] text-slate-500">
-        Main Menu
-    </p>
+        <p class="px-6 mb-3 text-[11px] font-semibold uppercase tracking-[0.30em] text-slate-500">
+            Main Menu
+        </p>
+        
         <!-- Dashboard -->
         <a href="{{ route('admin.dashboard') }}"
            class="flex items-center gap-3 px-6 py-3 transition {{ request()->routeIs('admin.dashboard') ? 'bg-slate-800/80 border-l-4 border-yellow-400 text-white font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
@@ -79,28 +74,27 @@
             Bahasa
         </a>
          
-        <!-- Bagian Bawah Sidebar (Utilitas & Pengaturan) -->
+        <!-- Bagian Bawah Sidebar -->
         <div class="mt-auto pt-4">
             
-            <!-- GARIS PEMISAH (DIVIDER) -->
             <hr class="border-slate-700 mx-6 my-3">
 
-    <p class="px-6 mb-3 text-[11px] font-semibold uppercase tracking-[0.30em] text-slate-500">
-        Website
-    </p>
-            <!-- Link Mode Admin / Lihat Website -->
+            <p class="px-6 mb-3 text-[11px] font-semibold uppercase tracking-[0.30em] text-slate-500">
+                Website
+            </p>
+            
             <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
                 <i class="bi bi-eye"></i> 
                 <span>Lihat Website</span>
             </a>
             
-            
             @if(auth()->user()->role == 'super_admin')
-            <hr class="border-slate-700 mx-6 my-3">
+                <hr class="border-slate-700 mx-6 my-3">
 
-    <p class="px-6 mb-3 text-[11px] font-semibold uppercase tracking-[0.30em] text-slate-500">
-        Sistem
-    </p>
+                <p class="px-6 mb-3 text-[11px] font-semibold uppercase tracking-[0.30em] text-slate-500">
+                    Sistem
+                </p>
+                
                 <!-- Pengaturan -->
                 <a href="{{ route('admin.settings.index') }}"
                    class="flex items-center gap-3 px-6 py-3 transition {{ request()->routeIs('admin.settings.*') ? 'bg-slate-800/80 border-l-4 border-yellow-400 text-white font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
@@ -121,15 +115,14 @@
                     <i class="bi bi-people-fill"></i>
                     User
                 </a>
-
             @endif
         </div>
 
     </nav>
 
     <!-- =========================================================
-         AREA LOGOUT (x-data diletakkan KHUSUS di sini agar aman)
-    ========================================================== -->
+         AREA LOGOUT (Sudah Diperbaiki Agar Aman dari Bentrokan Form)
+<!-- AREA LOGOUT (Bebas dari tag <form> agar tidak bentrok) -->
     <div class="border-t border-slate-700 p-5" x-data="{ showLogoutModal: false }">
         <!-- Tombol Trigger Logout -->
         <button
@@ -141,7 +134,6 @@
         </button>
 
         <!-- MODAL KONFIRMASI LOGOUT -->
-        <!-- style="display: none;" mencegah modal muncul saat pindah/load halaman -->
         <div x-show="showLogoutModal" 
              style="display: none;"
              class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -166,18 +158,16 @@
                         Batal
                     </button>
 
-                    <form method="POST" action="{{ route('logout') }}" class="m-0">
-                        @csrf
-                        <button type="submit" 
-                                class="px-4 py-2 rounded-lg text-sm bg-red-600 hover:bg-red-700 text-white font-semibold transition cursor-pointer">
-                            Ya, Keluar
-                        </button>
-                    </form>
+                    <!-- Memanggil form logout yang ada di master layout -->
+<!-- Tombol Ya, Keluar -->
+<button type="button" 
+        onclick="event.preventDefault(); document.getElementById('global-logout-form').submit();"
+        class="px-4 py-2 rounded-lg text-sm bg-red-600 hover:bg-red-700 text-white font-semibold transition cursor-pointer">
+    Ya, Keluar
+</button>
                 </div>
 
             </div>
         </div>
     </div>
-    <!-- END AREA LOGOUT -->
-
 </aside>

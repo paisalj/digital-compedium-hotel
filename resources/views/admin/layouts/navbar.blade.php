@@ -3,12 +3,11 @@
     <!-- Left -->
     <div class="flex items-center gap-5">
 
-        <!-- Mobile Menu (Opsional toggle jika ada script sidebar mobile) -->
-<!-- Tombol Hamburger di Navbar -->
-<button @click="sidebarOpen = !sidebarOpen" 
-        class="text-2xl text-slate-700 hover:text-yellow-500 transition focus:outline-none p-1 rounded-xl hover:bg-slate-100">
-    <i class="bi bi-list"></i>
-</button>
+        <!-- Tombol Hamburger di Navbar -->
+        <button @click="sidebarOpen = !sidebarOpen" 
+                class="text-2xl text-slate-700 hover:text-yellow-500 transition focus:outline-none p-1 rounded-xl hover:bg-slate-100">
+            <i class="bi bi-list"></i>
+        </button>
         <div>
             <h1 class="text-2xl font-bold text-slate-800">
                 @yield('page-title')
@@ -23,19 +22,17 @@
     <!-- Right -->
     <div class="flex items-center gap-5">
 
-
-
         <!-- Divider -->
         <div class="w-px h-10 bg-gray-300"></div>
 
         <!-- User Profile Dropdown -->
         <div class="relative" x-data="{ openProfile: false }">
             <button @click="openProfile = !openProfile" class="flex items-center gap-3 cursor-pointer focus:outline-none">
-@if(Auth::user()->avatar)
-    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" class="w-11 h-11 rounded-full border-2 border-yellow-400 object-cover shadow-sm" alt="Admin">
-@else
-    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=D4AF37&color=fff" class="w-11 h-11 rounded-full border-2 border-yellow-400 object-cover shadow-sm" alt="Admin">
-@endif
+                @if(Auth::user()->avatar)
+                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" class="w-11 h-11 rounded-full border-2 border-yellow-400 object-cover shadow-sm" alt="Admin">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=D4AF37&color=fff" class="w-11 h-11 rounded-full border-2 border-yellow-400 object-cover shadow-sm" alt="Admin">
+                @endif
                 <div class="hidden md:block text-left">
                     <h3 class="font-semibold text-slate-800 text-sm">
                         {{ Auth::user()->name ?? 'Administrator' }}
@@ -55,15 +52,20 @@
                     <p class="text-[11px] text-slate-500 truncate">{{ Auth::user()->email ?? 'admin@hotel.com' }}</p>
                 </div>
 
-<a href="{{ route('admin.profile.edit') }}" class="flex items-center space-x-2 px-4 py-2 text-slate-700 hover:bg-slate-50 font-medium">
-    <i class="bi bi-person-circle text-slate-400 text-sm"></i>
-    <span>Pengaturan Akun</span>
-</a>
+                <a href="{{ route('admin.profile.edit') }}" class="flex items-center space-x-2 px-4 py-2 text-slate-700 hover:bg-slate-50 font-medium">
+                    <i class="bi bi-person-circle text-slate-400 text-sm"></i>
+                    <span>Pengaturan Akun</span>
+                </a>
+
                 <div class="border-t border-slate-100 my-1"></div>
 
-                <!-- Form Logout -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
+                <!-- Tombol Logout Aman (Memanggil form global di app.blade.php) -->
+                <button type="button" 
+                        onclick="document.getElementById('global-logout-form').submit()" 
+                        class="w-full text-left flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-slate-50 font-medium cursor-pointer">
+                    <i class="bi bi-box-arrow-right text-red-500 text-sm"></i>
+                    <span>Logout</span>
+                </button>
             </div>
         </div>
 
