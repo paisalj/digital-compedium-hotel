@@ -6,411 +6,505 @@
 
 @section('content')
 
-<div class="-m-6 p-6 bg-slate-100 min-h-screen">
+<div class="bg-white rounded-2xl shadow-md p-6 w-full overflow-hidden">
 
     <div class="bg-slate-100 border border-slate-300 rounded-2xl shadow-md p-6">
 
-        <div class="space-y-6">
-    {{-- Header --}}
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-
-        <div>
-
-<h2 class="text-2xl font-bold">
-    🌐 Bahasa
-</h2>
-
-<p class="text-gray-500">
-    Kelola seluruh bahasa yang digunakan sistem.
-</p>
-
-        </div>
-
-        <div>
-
-            <a
-                href="{{ route('admin.languages.create') }}"
-              class="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-xl transition shadow-sm inline-flex items-center gap-2 text-sm"
-                <i class="bi bi-plus-lg"></i>
-
-                Tambah Bahasa
-
-            </a>
-
-        </div>
-
-    </div>
-
-    {{-- Statistik --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-
-        <div class="bg-white rounded-2xl shadow p-5">
-
-            <div class="text-gray-500 text-sm">
-
-                Total Bahasa
-
-            </div>
-
-            <div class="text-3xl font-bold mt-2">
-
-                {{ $languages->total() }}
-
-            </div>
-
-        </div>
-
-        <div class="bg-white rounded-2xl shadow p-5">
-
-            <div class="text-gray-500 text-sm">
-
-                Bahasa Aktif
-
-            </div>
-
-            <div class="text-3xl font-bold text-green-600 mt-2">
-
-                {{ $languages->where('is_active',true)->count() }}
-
-            </div>
-
-        </div>
-
-        <div class="bg-white rounded-2xl shadow p-5">
-
-            <div class="text-gray-500 text-sm">
-
-                Bahasa Nonaktif
-
-            </div>
-
-            <div class="text-3xl font-bold text-red-600 mt-2">
-
-                {{ $languages->where('is_active',false)->count() }}
-
-            </div>
-
-        </div>
-
-        <div class="bg-white rounded-2xl shadow p-5">
-
-            <div class="text-gray-500 text-sm">
-
-                Bahasa Default
-
-            </div>
-
-            <div class="text-xl font-bold text-blue-600 mt-2">
-
-                {{ optional($languages->firstWhere('is_default',true))->name ?? '-' }}
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- Toolbar --}}
-    <div class="bg-white rounded-2xl shadow p-5">
-
-        <form
-            method="GET"
-            action="{{ route('admin.languages.index') }}"
-            class="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+        {{-- HEADER --}}
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-8">
 
             <div>
 
-                <label class="block text-sm font-medium mb-2">
+                <h2 class="text-2xl font-bold">
+                    🌐 Bahasa
+                </h2>
 
-                    Cari Bahasa
-
-                </label>
-
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Nama / Native / Code..."
-                    class="w-full rounded-xl border-gray-300 focus:border-yellow-500 focus:ring-yellow-500">
+                <p class="text-gray-500 mt-1">
+                    Kelola seluruh bahasa yang digunakan sistem Digital Compendium.
+                </p>
 
             </div>
 
-            <div>
 
-                <label class="block text-sm font-medium mb-2">
 
-                    Status
+        <a
+            href="{{ route('admin.languages.create') }}"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap">
 
-                </label>
+            <i class="bi bi-plus-circle"></i>
+            Tambah Konten
 
-                <select
-                    name="status"
-                    class="w-full rounded-xl border-gray-300 focus:border-yellow-500 focus:ring-yellow-500">
+        </a>
 
-                    <option value="">
+        </div>
 
-                        Semua Status
+        {{-- CARD STATISTIK --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
 
-                    </option>
+            {{-- Total --}}
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
 
-                    <option
-                        value="active"
-                        @selected(request('status')=='active')>
+                <p class="text-sm text-blue-600 font-medium">
+                    🌐 Total Bahasa
+                </p>
 
-                        Aktif
-
-                    </option>
-
-                    <option
-                        value="inactive"
-                        @selected(request('status')=='inactive')>
-
-                        Nonaktif
-
-                    </option>
-
-                </select>
+                <h2 class="text-3xl font-bold text-blue-700 mt-2">
+                    {{ $languages->total() }}
+                </h2>
 
             </div>
 
-            <div>
+            {{-- Aktif --}}
+            <div class="bg-green-50 border border-green-200 rounded-xl p-5">
 
-                <label class="block text-sm font-medium mb-2">
+                <p class="text-sm text-green-600 font-medium">
+                    ✅ Bahasa Aktif
+                </p>
 
-                    Tampilkan
+                <h2 class="text-3xl font-bold text-green-700 mt-2">
+                    {{ $languages->where('is_active', true)->count() }}
+                </h2>
 
-                </label>
+            </div>
 
-                <select
-                    name="per_page"
-                    class="w-full rounded-xl border-gray-300 focus:border-yellow-500 focus:ring-yellow-500">
+            {{-- Nonaktif --}}
+            <div class="bg-red-50 border border-red-200 rounded-xl p-5">
 
-                    @foreach([10,25,50,100] as $page)
+                <p class="text-sm text-red-600 font-medium">
+                    ⛔ Bahasa Nonaktif
+                </p>
+
+                <h2 class="text-3xl font-bold text-red-700 mt-2">
+                    {{ $languages->where('is_active', false)->count() }}
+                </h2>
+
+            </div>
+
+            {{-- Default --}}
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+
+                <p class="text-sm text-yellow-600 font-medium">
+                    ⭐ Bahasa Default
+                </p>
+
+                <h2 class="text-xl font-bold text-yellow-700 mt-2">
+
+                    {{ optional($languages->firstWhere('is_default', true))->name ?? '-' }}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+        {{-- TOOLBAR --}}
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8">
+
+            <form
+                method="GET"
+                action="{{ route('admin.languages.index') }}"
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+                {{-- Search --}}
+                <div>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+
+                        Cari Bahasa
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Nama / Native / Code..."
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+
+                </div>
+
+                {{-- Status --}}
+                <div>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+
+                        Status
+
+                    </label>
+
+                    <select
+                        name="status"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500">
+
+                        <option value="">
+                            Semua Status
+                        </option>
 
                         <option
-                            value="{{ $page }}"
-                            @selected(request('per_page',10)==$page)>
+                            value="active"
+                            @selected(request('status')=='active')>
 
-                            {{ $page }} Data
+                            Aktif
 
                         </option>
 
-                    @endforeach
+                        <option
+                            value="inactive"
+                            @selected(request('status')=='inactive')>
 
-                </select>
+                            Nonaktif
 
-            </div>
+                        </option>
 
-            <div class="flex items-end gap-2">
-
-                <button
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl">
-
-                    <i class="bi bi-search"></i>
-
-                    Cari
-
-                </button>
-
-                <a
-                    href="{{ route('admin.languages.index') }}"
-                    class="border px-5 py-3 rounded-xl hover:bg-gray-100">
-
-                    Reset
-
-                </a>
-
-            </div>
-
-        </form>
-
-    </div>
-
-    {{-- List --}}
-    <div class="space-y-5">
-
-        @forelse($languages as $language)
-                <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-6">
-
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-
-                <div class="flex items-start gap-5">
-
-                    <div class="text-5xl">
-
-                        {{ $language->flag }}
-
-                    </div>
-
-                    <div>
-
-                        <h3 class="text-2xl font-bold">
-
-                            {{ $language->name }}
-
-                        </h3>
-
-                        <p class="text-gray-500 mt-1">
-
-                            {{ $language->native_name }}
-
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-x-10 gap-y-2 mt-4 text-sm">
-
-                            <div>
-
-                                <span class="font-semibold">
-
-                                    Code :
-
-                                </span>
-
-                                {{ strtoupper($language->code) }}
-
-                            </div>
-
-                            <div>
-
-                                <span class="font-semibold">
-
-                                    Urutan :
-
-                                </span>
-
-                                {{ $language->sort_order }}
-
-                            </div>
-
-                        </div>
-
-                        <div class="flex flex-wrap gap-2 mt-5">
-
-                            @if($language->is_default)
-
-                                <span
-                                    class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-
-                                    Default
-
-                                </span>
-
-                            @endif
-
-                            @if($language->is_active)
-
-                                <span
-                                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-
-                                    Aktif
-
-                                </span>
-
-                            @else
-
-                                <span
-                                    class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">
-
-                                    Nonaktif
-
-                                </span>
-
-                            @endif
-
-                        </div>
-
-                    </div>
+                    </select>
 
                 </div>
 
-                <div class="flex flex-wrap gap-3">
+                {{-- Per Page --}}
+                <div>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+
+                        Tampilkan
+
+                    </label>
+
+                    <select
+                        name="per_page"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500">
+
+                        @foreach([10,25,50,100] as $page)
+
+                            <option
+                                value="{{ $page }}"
+                                @selected(request('per_page',10)==$page)>
+
+                                {{ $page }} Data
+
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+                {{-- Tombol --}}
+                <div class="flex items-end gap-3">
+
+                    <button
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition">
+
+                        <i class="bi bi-search"></i>
+
+                        Cari
+
+                    </button>
 
                     <a
-                        href="{{ route('admin.languages.edit',$language) }}"
-                        class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition">
+                        href="{{ route('admin.languages.index') }}"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl transition">
 
-                        <i class="bi bi-pencil-square"></i>
-
-                        Edit
+                        Reset
 
                     </a>
 
-                    <form
-                        action="{{ route('admin.languages.destroy',$language) }}"
-                        method="POST"
-                        class="delete-form">
-
-                        @csrf
-
-                        @method('DELETE')
-
-                        <button
-                            type="submit"
-                            class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white transition">
-
-                            <i class="bi bi-trash"></i>
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
                 </div>
+
+            </form>
+
+            {{-- Ringkasan --}}
+            <div class="flex justify-between items-center mt-5">
+
+                <p class="text-sm text-gray-500">
+
+                    Menampilkan
+
+                    <span class="font-semibold">
+
+                        {{ $languages->count() }}
+
+                    </span>
+
+                    dari
+
+                    <span class="font-semibold">
+
+                        {{ $languages->total() }}
+
+                    </span>
+
+                    bahasa.
+
+                </p>
+
+                @if(request('search'))
+
+                    <p class="text-sm text-blue-600">
+
+                        Hasil pencarian :
+
+                        <strong>
+
+                            "{{ request('search') }}"
+
+                        </strong>
+
+                    </p>
+
+                @endif
 
             </div>
 
         </div>
+{{-- LIST DATA --}}
+@if($languages->count())
 
-    @empty
+<div class="overflow-x-auto">
 
-        <div class="bg-white rounded-2xl shadow p-16 text-center">
+<table class="w-full border-collapse">
 
-            <i class="bi bi-translate text-7xl text-gray-300"></i>
+    <thead class="bg-slate-300 border-b border-slate-400">
 
-            <h3 class="text-2xl font-bold mt-6">
+        <tr>
 
-                Belum Ada Bahasa
+            <th class="text-center py-4 w-16 font-semibold uppercase text-sm">
+                No
+            </th>
 
-            </h3>
+            <th class="text-center py-4 w-24 font-semibold uppercase text-sm">
+                Flag
+            </th>
 
-            <p class="text-gray-500 mt-2">
+            <th class="text-left py-4 font-semibold uppercase text-sm">
+                Nama Bahasa
+            </th>
 
-                Silakan tambahkan bahasa pertama untuk sistem.
+            <th class="text-left py-4 font-semibold uppercase text-sm">
+                Native
+            </th>
 
-            </p>
+            <th class="text-center py-4 font-semibold uppercase text-sm">
+                Code
+            </th>
+
+            <th class="text-center py-4 font-semibold uppercase text-sm">
+                Urutan
+            </th>
+
+            <th class="text-center py-4 font-semibold uppercase text-sm">
+                Status
+            </th>
+
+            <th class="text-center py-4 font-semibold uppercase text-sm">
+                Default
+            </th>
+
+            <th class="text-center py-4 font-semibold uppercase text-sm">
+                Aksi
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody class="divide-y divide-gray-100">
+
+@foreach($languages as $language)
+
+<tr class="odd:bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition">
+
+    <td class="text-center py-4 font-semibold">
+
+        {{ $languages->firstItem() + $loop->index }}
+
+    </td>
+
+    <td class="text-center py-4">
+
+        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mx-auto text-2xl">
+
+            {{ $language->flag }}
+
+        </div>
+
+    </td>
+
+    <td class="py-4">
+
+        <div class="font-semibold text-gray-800">
+
+            {{ $language->name }}
+
+        </div>
+
+    </td>
+
+    <td class="py-4 text-gray-600">
+
+        {{ $language->native_name }}
+
+    </td>
+
+    <td class="text-center py-4">
+
+        <span class="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 font-semibold">
+
+            {{ strtoupper($language->code) }}
+
+        </span>
+
+    </td>
+
+    <td class="text-center py-4">
+
+        {{ $language->sort_order }}
+
+    </td>
+
+    <td class="text-center py-4">
+
+        @if($language->is_active)
+
+            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
+
+                🟢 Aktif
+
+            </span>
+
+        @else
+
+            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-semibold">
+
+                🔴 Nonaktif
+
+            </span>
+
+        @endif
+
+    </td>
+
+    <td class="text-center py-4">
+
+        @if($language->is_default)
+
+            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+
+                ⭐ Default
+
+            </span>
+
+        @else
+
+            <span class="text-gray-400">
+
+                —
+
+            </span>
+
+        @endif
+
+    </td>
+
+    <td class="py-4">
+
+        <div class="flex justify-center gap-2">
 
             <a
-                href="{{ route('admin.languages.create') }}"
-                class="inline-flex items-center gap-2 mt-8 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-xl">
+                href="{{ route('admin.languages.edit',$language) }}"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
 
-                <i class="bi bi-plus-circle"></i>
-
-                Tambah Bahasa
+                <i class="bi bi-pencil-square"></i>
 
             </a>
 
-        </div>
-        </div>
+            <form
+                action="{{ route('admin.languages.destroy',$language) }}"
+                method="POST"
+                class="delete-form">
+
+                @csrf
+
+                @method('DELETE')
+
+                <button
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
+
+                    <i class="bi bi-trash"></i>
+
+                </button>
+
+            </form>
+
         </div>
 
-    @endforelse
+    </td>
+
+</tr>
+
+@endforeach
+
+    </tbody>
+
+</table>
+
+</div>
+
+@else
+
+<div class="bg-slate-50 border border-dashed border-slate-300 rounded-2xl py-20 text-center">
+
+    <div class="text-6xl mb-5">
+
+        🌐
 
     </div>
-        {{-- Pagination --}}
-    @if($languages->hasPages())
 
-        <div class="bg-white rounded-2xl shadow p-5">
+    <h3 class="text-2xl font-bold text-gray-700">
 
-            {{ $languages->withQueryString()->links() }}
+        Belum Ada Bahasa
 
-        </div>
+    </h3>
 
-    @endif
+    <p class="text-gray-500 mt-2">
+
+        Silakan tambahkan bahasa pertama.
+
+    </p>
+
+    <a
+        href="{{ route('admin.languages.create') }}"
+        class="inline-flex items-center gap-2 mt-8 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-xl">
+
+        <i class="bi bi-plus-circle"></i>
+
+        Tambah Bahasa
+
+    </a>
+
+</div>
+
+@endif
+
+
+{{-- Pagination --}}
+@if($languages->hasPages())
+
+<div class="mt-6">
+
+    {{ $languages->withQueryString()->links() }}
+
+</div>
+
+@endif
+
+    </div>
 
 </div>
 
 @push('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 
@@ -424,7 +518,11 @@ document.querySelectorAll('.delete-form').forEach(form => {
 
             title: 'Hapus Bahasa?',
 
-            text: 'Data yang dihapus tidak dapat dikembalikan.',
+            html: `
+                <p class="text-gray-600">
+                    Bahasa yang dihapus tidak dapat dikembalikan lagi.
+                </p>
+            `,
 
             icon: 'warning',
 
@@ -455,7 +553,6 @@ document.querySelectorAll('.delete-form').forEach(form => {
 });
 
 </script>
-
 @endpush
 
 @endsection
