@@ -83,11 +83,16 @@
         }
 
         /* Memastikan gambar tetap rapi */
+/* Memastikan gambar mengikuti ukuran dari dashboard & aman di HP */
         .custom-content-table img {
-            max-width: 50px;
+            max-width: 100%;    /* Batas maksimal: tidak akan keluar/jebol dari lebar layar HP */
+            width: auto;        /* Mengikuti ukuran width yang kamu setel di dashboard */
+            height: auto;       /* Menjaga proporsi gambar agar tidak gepeng */
             border-radius: 6px;
-            display: inline-block;
+            display: block;
+            margin: 10px auto;  /* Posisi gambar otomatis berada di tengah */
         }
+        
         .custom-content-table p {
             margin-bottom: 1rem !important;
         }
@@ -282,10 +287,6 @@
                 </span>
             </a>
 
-<span id="stickyCategoryTitle" 
-      style="font-weight: 700; color: #111827; font-size: 15px; line-height: 1.2; white-space: normal; word-break: break-word; opacity: 0; transition: opacity 0.3s ease-in-out; pointer-events: none;">
-    {{ $categoryName }}
-</span>
 <!-- Bagian Kanan: Tombol Dark Mode & Dropdown Bahasa -->
 <div style="position: relative; z-index: 50; display: flex; align-items: center; gap: 4px;">
     

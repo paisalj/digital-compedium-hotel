@@ -337,10 +337,11 @@
 @foreach($media as $item)
     <div class="media-item group cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition-all bg-white hover:shadow-md" 
          data-name="{{ strtolower($item->alt_text) }}"
-         onclick="selectImage('{{ asset('storage/'.$item->file_path) }}', this)"> <!-- Tambahkan parameter 'this' -->
+         onclick="selectImage('{{ asset('storage/'.$item->file_path) }}', this)">
         
         <div class="w-full h-24 overflow-hidden rounded">
-            <img src="{{ asset('storage/'.$item->file_path) }}" class="w-full h-full object-cover">
+            <!-- ✅ UBAH MENJADI INI -->
+            <img src="{{ asset('storage/' . $item->file_path) }}" class="w-full h-full object-cover">
         </div>
         
         <p class="text-[11px] text-gray-700 mt-2 truncate text-center font-medium bg-gray-50 py-1 rounded">
@@ -348,7 +349,8 @@
         </p>
     </div>
 @endforeach
-        </div>
+
+</div>
 
         <!-- Footer (Pagination & Action) -->
         <div class="p-4 border-t flex justify-between items-center bg-gray-50">
@@ -501,6 +503,11 @@ document.addEventListener('DOMContentLoaded', function() {
         selector: '.tinymce-editor',
         height: 350,
         menubar: false,
+
+        relative_urls: false,
+        remove_script_host: false,
+        convert_urls: false,
+
         plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',

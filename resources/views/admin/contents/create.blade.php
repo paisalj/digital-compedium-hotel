@@ -353,29 +353,29 @@ class="text-sm font-medium text-red-600">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-
-    let tinymceCallback = null;
+// ===================================================================
+// VARIABLE & FUNGSI GLOBAL MEDIA LIBRARY (Scope Luar)
+// ===================================================================
+let tinymceCallback = null;
 let selectedImageUrl = null;
 
 function openMediaModal(callback) {
     tinymceCallback = callback;
-    // Buka modal library kita (akan menutupi modal TinyMCE karena z-index kita buat menjadi sangat tinggi)
+    // Buka modal library kita di atas modal TinyMCE
     document.getElementById('mediaModal').classList.remove('hidden');
 }
 
 function closeMediaModal() {
-    // Cukup sembunyikan modal library kita saja
+    // Sembunyikan modal library saja
     document.getElementById('mediaModal').classList.add('hidden');
 }
+
 function selectImage(url, element) {
     selectedImageUrl = url;
-    
-    // Hapus efek warna biru dari semua gambar lain
+    // Beri efek border biru pada gambar yang dipilih
     document.querySelectorAll('.media-item').forEach(el => {
         el.classList.remove('border-blue-500', 'ring-2', 'ring-blue-500');
     });
-    
-    // Beri efek warna biru pada gambar yang baru saja di-klik
     if (element) {
         element.classList.add('border-blue-500', 'ring-2', 'ring-blue-500');
     }
@@ -383,14 +383,12 @@ function selectImage(url, element) {
 
 function confirmSelection() {
     if (selectedImageUrl && tinymceCallback) {
-        // Trik Pro: Kirim URL gambar ke input "Source" milik modal TinyMCE
+        // Kirim URL gambar ke kolom "Source" modal TinyMCE
         tinymceCallback(selectedImageUrl, { alt: 'Gambar konten' });
         
-        // Bersihkan data penampung
+        // Reset & Tutup modal library
         tinymceCallback = null;
         selectedImageUrl = null;
-        
-        // Tutup modal library kita, sehingga modal "Insert/Edit Image" TinyMCE otomatis kelihatan lagi
         closeMediaModal();
     } else {
         Swal.fire({
@@ -410,13 +408,15 @@ function filterMedia() {
     }
 }
 
+// ===================================================================
+// INISIALISASI SAAT DOM READY (Scope Dalam)
+// ===================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('category-select');
     const iconPreview = document.getElementById('icon-preview');
     const iconDisplay = document.getElementById('icon-display');
 
     if (categorySelect) {
-        // 1. MENGUBAH SELECT BIASA MENJADI CHOICES.JS (DROPDOWN PENDEK YANG BISA DI-SCROLL)
         const choicesInstance = new Choices(categorySelect, {
             searchEnabled: true,
             searchPlaceholderValue: 'Cari kategori...',
@@ -424,7 +424,6 @@ document.addEventListener('DOMContentLoaded', function() {
             shouldSort: false,
         });
 
-        // 2. MENGATUR MUNCULNYA IKON EMAS SAAT KATEGORI DIPILIH
         categorySelect.addEventListener('change', function() {
             checkFormValidation();
             const selectedValue = this.value;
@@ -440,146 +439,116 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-const form = document.querySelector('form[action="{{ route("admin.contents.store") }}"]');
+    const form = document.querySelector('form[action="{{ route("admin.contents.store") }}"]');
     if (form) {
         form.addEventListener('submit', function() {
-            // Ini memaksa TinyMCE untuk menyalin konten ke textarea sebelum dikirim
+            // Memaksa TinyMCE menyalin konten ke textarea sebelum dikirim
             tinymce.triggerSave();
         });
     }
-    // Inisialisasi TinyMCE Editor
-tinymce.init({
-    selector: '.tinymce-editor',
-    height: 350,
-    menubar: false,
 
-    plugins: [
-        'advlist',
-        'autolink',
-        'lists',
-        'link',
-        'image',
-        'table'
-    ],
+    // Inisialisasi TinyMCE Editor (Sudah Disamakan Menjadi Lengkap)
+    tinymce.init({
+        selector: '.tinymce-editor',
+        height: 350,
+        menubar: false,
 
-    toolbar:
-        'undo redo | bold italic | image table',
+        relative_urls: false,
+        remove_script_host: false,
+        convert_urls: false,
 
-    file_picker_callback: function(cb, value, meta){
-
-        if(meta.filetype === 'image'){
-            openMediaModal(cb);
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | ' +
+            'bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'table image media | removeformat | help',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: #374151; }',
+        automatic_uploads: true,
+        file_picker_types: 'image',
+        file_picker_callback: function(cb, value, meta) {
+            if (meta.filetype === 'image') {
+                openMediaModal(cb);
+            }
+        },
+        setup: function(editor) {
+            editor.on('keyup change', function() {
+                checkFormValidation();
+            });
         }
-
-    },
-
-    setup: function(editor){
-
-        editor.on('keyup change', function(){
-
-            checkFormValidation();
-
-        });
-
-    }
-
-});
-// ========================================
-// Validasi Form Live
-// ========================================
-
-const saveButton = document.getElementById('saveButton');
-const warning = document.getElementById('form-warning');
-
-function checkFormValidation(){
-
-    let valid = true;
-
-    // kategori
-    if(categorySelect.value==""){
-        valid=false;
-    }
-
-    // semua judul
-    document.querySelectorAll('[data-language]').forEach(function(input){
-
-        if(input.value.trim()==""){
-            valid=false;
-        }
-
     });
 
-    // semua editor TinyMCE
-// semua editor TinyMCE (diubah agar aman dari undefined)
-    if (typeof tinymce !== 'undefined' && tinymce.editors) {
-        tinymce.editors.forEach(function(editor){
-            if(editor.getContent({format:'text'}).trim()==""){
-                valid=false;
+    // ========================================
+    // Validasi Form Live
+    // ========================================
+    const saveButton = document.getElementById('saveButton');
+    const warning = document.getElementById('form-warning');
+
+    function checkFormValidation() {
+        let valid = true;
+
+        if (categorySelect && categorySelect.value === "") {
+            valid = false;
+        }
+
+        document.querySelectorAll('[data-language]').forEach(function(input) {
+            if (input.value.trim() === "") {
+                valid = false;
             }
         });
-    }
-        if(valid){
 
-        warning.innerHTML="✅ Semua data telah lengkap dan siap disimpan.";
-        warning.classList.remove("text-red-600");
-        warning.classList.add("text-green-600");
+        if (typeof tinymce !== 'undefined' && tinymce.editors) {
+            tinymce.editors.forEach(function(editor) {
+                if (!editor.initialized) return;
+                if (editor.getContent({format: 'text'}).trim() === "") {
+                    valid = false;
+                }
+            });
+        }
 
-        saveButton.disabled=false;
-
-        saveButton.classList.remove(
-            "opacity-50",
-            "cursor-not-allowed"
-        );
-
-    }else{
-
-        warning.innerHTML="❌ Lengkapi seluruh data terlebih dahulu.";
-
-        warning.classList.remove("text-green-600");
-        warning.classList.add("text-red-600");
-
-        saveButton.disabled=true;
-
-        saveButton.classList.add(
-            "opacity-50",
-            "cursor-not-allowed"
-        );
-
+        if (warning && saveButton) {
+            if (valid) {
+                warning.innerHTML = "✅ Semua data telah lengkap dan siap disimpan.";
+                warning.classList.remove("text-red-600");
+                warning.classList.add("text-green-600");
+                saveButton.disabled = false;
+                saveButton.classList.remove("opacity-50", "cursor-not-allowed");
+            } else {
+                warning.innerHTML = "❌ Lengkapi seluruh data terlebih dahulu.";
+                warning.classList.remove("text-green-600");
+                warning.classList.add("text-red-600");
+                saveButton.disabled = true;
+                saveButton.classList.add("opacity-50", "cursor-not-allowed");
+            }
+        }
     }
 
-}
-    // Otomatis isi Slug Indonesia saat mengetik Judul Indonesia
-// ===========================
-// Auto Generate Slug Semua Bahasa
-// ===========================
+    document.querySelectorAll('[data-language]').forEach(function(titleInput) {
+        const lang = titleInput.dataset.language;
+        const slugInput = document.querySelector(`[data-slug="${lang}"]`);
 
-document.querySelectorAll('[data-language]').forEach(function(titleInput){
+        if (!slugInput) return;
 
-    const lang = titleInput.dataset.language;
-    const slugInput = document.querySelector(`[data-slug="${lang}"]`);
+        titleInput.addEventListener('input', function() {
+            slugInput.value = this.value
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]/g, '');
 
-    if(!slugInput) return;
-
-    titleInput.addEventListener('input', function(){
-
-        slugInput.value = this.value
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g,'-')
-            .replace(/[^\w\-]/g,'');
-
-        checkFormValidation();
-
+            checkFormValidation();
+        });
     });
 
-});
-    // Fitur Terjemahan AI otomatis untuk Judul & Deskripsi (TinyMCE)
+    // Fitur Terjemahan AI otomatis untuk Judul & Deskripsi
     const btnTranslate = document.getElementById('translate-ai');
     if (btnTranslate) {
         btnTranslate.addEventListener('click', async function () {
             const indoTitleInput = document.querySelector('[data-language="id"]');
             
-            // PERBAIKAN: Menemukan ID bahasa dinamis dari element input Indonesia secara presisi
             let indoLangId = '1';
             if (indoTitleInput) {
                 const nameAttr = indoTitleInput.getAttribute('name');
@@ -587,7 +556,6 @@ document.querySelectorAll('[data-language]').forEach(function(titleInput){
                 if (match) indoLangId = match[1];
             }
             
-            // Mengambil konten HTML dari TinyMCE Indonesia menggunakan ID yang tepat
             let indoBodyContent = '';
             const activeIndoEditor = tinymce.get('body_' + indoLangId);
             if (activeIndoEditor) {
@@ -608,7 +576,6 @@ document.querySelectorAll('[data-language]').forEach(function(titleInput){
             const sourceTitle = indoTitleInput.value.trim();
 
             try {
-                // KIRIM JUDUL & DESKRIPSI KE BACKEND
                 const response = await fetch("{{ route('admin.contents.translate') }}", {
                     method: "POST",
                     headers: {
@@ -646,13 +613,11 @@ document.querySelectorAll('[data-language]').forEach(function(titleInput){
                     return; 
                 }
 
-                // MASUKKAN HASIL TERJEMAHAN KE JUDUL & TINYMCE MASING-MASING BAHASA
                 if (result.translations) {
                     Object.keys(result.translations).forEach(langId => {
                         const titleInput = document.querySelector(`[name="translations[${langId}][title]"]`);
                         const slugInput = document.querySelector(`[name="translations[${langId}][slug]"]`);
 
-                        // Isi Judul & Slug
                         if (titleInput) {
                             const translatedTitle = result.translations[langId].title || result.translations[langId].name;
                             if (translatedTitle) {
@@ -667,7 +632,6 @@ document.querySelectorAll('[data-language]').forEach(function(titleInput){
                             }
                         }
 
-                        // PERBAIKAN: Mengisi deskripsi ke TinyMCE menggunakan ID terarah (body_ID)
                         const translatedBody = result.translations[langId].body || '';
                         const editorInstance = tinymce.get('body_' + langId);
                         
@@ -706,6 +670,7 @@ document.querySelectorAll('[data-language]').forEach(function(titleInput){
             btnTranslate.innerHTML = `<i class="bi bi-stars"></i> Terjemahkan AI`;
         }
     }
+
     checkFormValidation();
 });
 </script>

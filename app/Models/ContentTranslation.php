@@ -18,6 +18,44 @@ class ContentTranslation extends Model
         'body'
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | AUTOMATIC ACTIVITY LOG (TAMBAHKAN BAGIAN INI) ⭐
+    |--------------------------------------------------------------------------
+    */
+    protected static function booted()
+    {
+        static::created(function ($translation) {
+            ActivityLog::create([
+                'user_id'     => auth()->id(),
+                'module'      => 'Content',
+                'action'      => 'CREATE',
+                'description' => "Content ID {$translation->content_id} telah di-create",
+                'ip_address'  => request()->ip(),
+            ]);
+        });
+
+        static::updated(function ($translation) {
+            ActivityLog::create([
+                'user_id'     => auth()->id(),
+                'module'      => 'Content',
+                'action'      => 'UPDATE',
+                'description' => "Content ID {$translation->content_id} telah di-update",
+                'ip_address'  => request()->ip(),
+            ]);
+        });
+
+        static::deleted(function ($translation) {
+            ActivityLog::create([
+                'user_id'     => auth()->id(),
+                'module'      => 'Content',
+                'action'      => 'DELETE',
+                'description' => "Content ID {$translation->content_id} telah di-delete",
+                'ip_address'  => request()->ip(),
+            ]);
+        });
+    }
+
     // Relasi balik ke data induk konten
     public function content()
     {
