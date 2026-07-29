@@ -28,7 +28,8 @@
 <div class="space-y-6">
     <div>
         <label class="block mb-2 font-semibold text-gray-700 text-sm">
-            Nama Gambar <span class="text-red-500">*</span>
+            Nama Gambar <span class="text-red-500">*</span> <br>
+           <h6 class="text-xs text-gray-500">tidak boleh ada spasi</h6>
         </label>
         <input type="text" name="alt_text" placeholder="Contoh: Foto Ayam Goreng Spesial..." required
                class="w-full border border-gray-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
