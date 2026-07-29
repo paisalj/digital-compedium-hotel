@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 29, 2026 at 04:33 AM
+-- Generation Time: Jul 29, 2026 at 10:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -56,7 +56,38 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `module`, `action`, `description`,
 (669, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 02:30:43', '2026-07-29 02:30:43'),
 (670, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 02:31:28', '2026-07-29 02:31:28'),
 (671, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 02:31:29', '2026-07-29 02:31:29'),
-(672, 2, 'Media', 'create', 'Media ID 1 telah di-create', '127.0.0.1', '2026-07-29 02:32:24', '2026-07-29 02:32:24');
+(672, 2, 'Media', 'create', 'Media ID 1 telah di-create', '127.0.0.1', '2026-07-29 02:32:24', '2026-07-29 02:32:24'),
+(673, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 02:34:36', '2026-07-29 02:34:36'),
+(674, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 02:34:36', '2026-07-29 02:34:36'),
+(675, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 03:53:59', '2026-07-29 03:53:59'),
+(676, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 03:53:59', '2026-07-29 03:53:59'),
+(677, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 03:54:20', '2026-07-29 03:54:20'),
+(678, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 03:54:20', '2026-07-29 03:54:20'),
+(679, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:01:34', '2026-07-29 04:01:34'),
+(680, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:01:34', '2026-07-29 04:01:34'),
+(681, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:01:49', '2026-07-29 04:01:49'),
+(682, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:01:49', '2026-07-29 04:01:49'),
+(683, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:02:54', '2026-07-29 04:02:54'),
+(684, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:02:54', '2026-07-29 04:02:54'),
+(685, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:03:13', '2026-07-29 04:03:13'),
+(686, 2, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:03:13', '2026-07-29 04:03:13'),
+(687, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:07:58', '2026-07-29 04:07:58'),
+(688, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:07:58', '2026-07-29 04:07:58'),
+(689, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:08:27', '2026-07-29 04:08:27'),
+(690, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:08:27', '2026-07-29 04:08:27'),
+(691, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:08:29', '2026-07-29 04:08:29'),
+(692, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:08:29', '2026-07-29 04:08:29'),
+(693, 1, 'User', 'update', 'User ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:10:44', '2026-07-29 04:10:44'),
+(694, 1, 'User', 'update', 'User ID 2 telah di-update', '127.0.0.1', '2026-07-29 04:11:20', '2026-07-29 04:11:20'),
+(695, 1, 'User', 'update', 'User ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:20:55', '2026-07-29 04:20:55'),
+(696, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:23:27', '2026-07-29 04:23:27'),
+(697, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 04:23:27', '2026-07-29 04:23:27'),
+(698, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 05:48:21', '2026-07-29 05:48:21'),
+(699, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 05:48:21', '2026-07-29 05:48:21'),
+(700, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 05:48:34', '2026-07-29 05:48:34'),
+(701, 1, 'Category', 'update', 'Category ID 1 telah di-update', '127.0.0.1', '2026-07-29 05:48:34', '2026-07-29 05:48:34'),
+(702, 1, 'User', 'update', 'User ID 1 telah di-update', '127.0.0.1', '2026-07-29 06:47:31', '2026-07-29 06:47:31'),
+(703, 1, 'User', 'update', 'User ID 1 telah di-update', '127.0.0.1', '2026-07-29 07:56:54', '2026-07-29 07:56:54');
 
 -- --------------------------------------------------------
 
@@ -116,7 +147,7 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`, `deleted_at`, `views`) VALUES
-(1, 'wifi dan username', 'wifi-dan-username', 'bi-wifi', 1, 1, '2026-07-29 02:08:21', '2026-07-29 02:31:29', NULL, 8);
+(1, 'wifi dan username', 'wifi-dan-username', 'bi-wifi', 1, 1, '2026-07-29 02:08:21', '2026-07-29 05:48:34', NULL, 34);
 
 -- --------------------------------------------------------
 
@@ -231,7 +262,20 @@ INSERT INTO `guest_device_logs` (`id`, `device`, `ip_address`, `created_at`, `up
 (147, 'Mobile', '127.0.0.1', '2026-07-29 02:27:26', '2026-07-29 02:27:26'),
 (148, 'Mobile', '127.0.0.1', '2026-07-29 02:27:37', '2026-07-29 02:27:37'),
 (149, 'Mobile', '127.0.0.1', '2026-07-29 02:30:43', '2026-07-29 02:30:43'),
-(150, 'Mobile', '127.0.0.1', '2026-07-29 02:31:29', '2026-07-29 02:31:29');
+(150, 'Mobile', '127.0.0.1', '2026-07-29 02:31:29', '2026-07-29 02:31:29'),
+(151, 'Mobile', '127.0.0.1', '2026-07-29 02:34:36', '2026-07-29 02:34:36'),
+(152, 'Mobile', '127.0.0.1', '2026-07-29 03:53:59', '2026-07-29 03:53:59'),
+(153, 'Mobile', '127.0.0.1', '2026-07-29 03:54:20', '2026-07-29 03:54:20'),
+(154, 'Mobile', '127.0.0.1', '2026-07-29 04:01:34', '2026-07-29 04:01:34'),
+(155, 'Mobile', '127.0.0.1', '2026-07-29 04:01:49', '2026-07-29 04:01:49'),
+(156, 'Mobile', '127.0.0.1', '2026-07-29 04:02:54', '2026-07-29 04:02:54'),
+(157, 'Mobile', '127.0.0.1', '2026-07-29 04:03:13', '2026-07-29 04:03:13'),
+(158, 'Mobile', '127.0.0.1', '2026-07-29 04:07:58', '2026-07-29 04:07:58'),
+(159, 'Mobile', '127.0.0.1', '2026-07-29 04:08:27', '2026-07-29 04:08:27'),
+(160, 'Mobile', '127.0.0.1', '2026-07-29 04:08:29', '2026-07-29 04:08:29'),
+(161, 'Mobile', '127.0.0.1', '2026-07-29 04:23:27', '2026-07-29 04:23:27'),
+(162, 'Mobile', '127.0.0.1', '2026-07-29 05:48:21', '2026-07-29 05:48:21'),
+(163, 'Mobile', '127.0.0.1', '2026-07-29 05:48:34', '2026-07-29 05:48:34');
 
 -- --------------------------------------------------------
 
@@ -247,6 +291,13 @@ CREATE TABLE `guest_favorites` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `guest_favorites`
+--
+
+INSERT INTO `guest_favorites` (`id`, `ip_address`, `category_id`, `content_id`, `created_at`, `updated_at`) VALUES
+(14, '127.0.0.1', 1, 1, '2026-07-29 04:08:33', '2026-07-29 04:08:33');
 
 -- --------------------------------------------------------
 
@@ -273,7 +324,52 @@ INSERT INTO `guest_language_logs` (`id`, `language_name`, `ip_address`, `created
 (290, 'Indo', '127.0.0.1', '2026-07-29 02:27:26', '2026-07-29 02:27:26'),
 (291, 'Dayak', '127.0.0.1', '2026-07-29 02:27:37', '2026-07-29 02:27:37'),
 (292, 'Dayak', '127.0.0.1', '2026-07-29 02:30:43', '2026-07-29 02:30:43'),
-(293, 'Dayak', '127.0.0.1', '2026-07-29 02:31:28', '2026-07-29 02:31:28');
+(293, 'Dayak', '127.0.0.1', '2026-07-29 02:31:28', '2026-07-29 02:31:28'),
+(294, 'Dayak', '127.0.0.1', '2026-07-29 02:34:36', '2026-07-29 02:34:36'),
+(295, 'Indo', '127.0.0.1', '2026-07-29 02:36:47', '2026-07-29 02:36:47'),
+(296, 'Indo', '127.0.0.1', '2026-07-29 02:37:14', '2026-07-29 02:37:14'),
+(297, 'Indo', '127.0.0.1', '2026-07-29 02:37:45', '2026-07-29 02:37:45'),
+(298, 'Indo', '127.0.0.1', '2026-07-29 02:43:40', '2026-07-29 02:43:40'),
+(299, 'Indo', '127.0.0.1', '2026-07-29 02:45:40', '2026-07-29 02:45:40'),
+(300, 'Indo', '127.0.0.1', '2026-07-29 02:45:56', '2026-07-29 02:45:56'),
+(301, 'Indo', '127.0.0.1', '2026-07-29 03:52:46', '2026-07-29 03:52:46'),
+(302, 'Indo', '127.0.0.1', '2026-07-29 03:52:48', '2026-07-29 03:52:48'),
+(303, 'Indo', '127.0.0.1', '2026-07-29 03:52:49', '2026-07-29 03:52:49'),
+(304, 'Indo', '127.0.0.1', '2026-07-29 03:52:50', '2026-07-29 03:52:50'),
+(305, 'Indo', '127.0.0.1', '2026-07-29 03:52:55', '2026-07-29 03:52:55'),
+(306, 'Indo', '127.0.0.1', '2026-07-29 03:53:50', '2026-07-29 03:53:50'),
+(307, 'Indo', '127.0.0.1', '2026-07-29 03:53:54', '2026-07-29 03:53:54'),
+(308, 'Indo', '127.0.0.1', '2026-07-29 03:53:59', '2026-07-29 03:53:59'),
+(309, 'Indo', '127.0.0.1', '2026-07-29 03:54:12', '2026-07-29 03:54:12'),
+(310, 'Indo', '127.0.0.1', '2026-07-29 03:54:20', '2026-07-29 03:54:20'),
+(311, 'Indo', '127.0.0.1', '2026-07-29 03:54:27', '2026-07-29 03:54:27'),
+(312, 'Indo', '127.0.0.1', '2026-07-29 03:54:48', '2026-07-29 03:54:48'),
+(313, 'Indo', '127.0.0.1', '2026-07-29 03:56:58', '2026-07-29 03:56:58'),
+(314, 'Indo', '127.0.0.1', '2026-07-29 04:01:23', '2026-07-29 04:01:23'),
+(315, 'Indo', '127.0.0.1', '2026-07-29 04:01:34', '2026-07-29 04:01:34'),
+(316, 'Indo', '127.0.0.1', '2026-07-29 04:01:43', '2026-07-29 04:01:43'),
+(317, 'Indo', '127.0.0.1', '2026-07-29 04:01:49', '2026-07-29 04:01:49'),
+(318, 'Indo', '127.0.0.1', '2026-07-29 04:02:54', '2026-07-29 04:02:54'),
+(319, 'Indo', '127.0.0.1', '2026-07-29 04:03:02', '2026-07-29 04:03:02'),
+(320, 'Indo', '127.0.0.1', '2026-07-29 04:03:10', '2026-07-29 04:03:10'),
+(321, 'Indo', '127.0.0.1', '2026-07-29 04:03:13', '2026-07-29 04:03:13'),
+(322, 'Indo', '127.0.0.1', '2026-07-29 04:03:23', '2026-07-29 04:03:23'),
+(323, 'Indo', '127.0.0.1', '2026-07-29 04:07:36', '2026-07-29 04:07:36'),
+(324, 'Indo', '127.0.0.1', '2026-07-29 04:07:39', '2026-07-29 04:07:39'),
+(325, 'Indo', '127.0.0.1', '2026-07-29 04:07:54', '2026-07-29 04:07:54'),
+(326, 'Indo', '127.0.0.1', '2026-07-29 04:07:58', '2026-07-29 04:07:58'),
+(327, 'Indo', '127.0.0.1', '2026-07-29 04:08:09', '2026-07-29 04:08:09'),
+(328, 'Indo', '127.0.0.1', '2026-07-29 04:08:27', '2026-07-29 04:08:27'),
+(329, 'Indo', '127.0.0.1', '2026-07-29 04:08:29', '2026-07-29 04:08:29'),
+(330, 'Indo', '127.0.0.1', '2026-07-29 04:08:35', '2026-07-29 04:08:35'),
+(331, 'Indo', '127.0.0.1', '2026-07-29 04:23:27', '2026-07-29 04:23:27'),
+(332, 'Indo', '127.0.0.1', '2026-07-29 05:45:01', '2026-07-29 05:45:01'),
+(333, 'Indo', '127.0.0.1', '2026-07-29 05:46:31', '2026-07-29 05:46:31'),
+(334, 'Indo', '127.0.0.1', '2026-07-29 05:48:13', '2026-07-29 05:48:13'),
+(335, 'Indo', '127.0.0.1', '2026-07-29 05:48:21', '2026-07-29 05:48:21'),
+(336, 'Dayak', '127.0.0.1', '2026-07-29 05:48:34', '2026-07-29 05:48:34'),
+(337, 'Indo', '127.0.0.1', '2026-07-29 05:49:13', '2026-07-29 05:49:13'),
+(338, 'Dayak', '127.0.0.1', '2026-07-29 06:48:30', '2026-07-29 06:48:30');
 
 -- --------------------------------------------------------
 
@@ -298,7 +394,20 @@ INSERT INTO `guest_views` (`id`, `category_id`, `category_name`, `ip_address`, `
 (178, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 02:27:26', '2026-07-29 02:27:26'),
 (179, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 02:27:37', '2026-07-29 02:27:37'),
 (180, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 02:30:43', '2026-07-29 02:30:43'),
-(181, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 02:31:28', '2026-07-29 02:31:28');
+(181, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 02:31:28', '2026-07-29 02:31:28'),
+(182, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 02:34:36', '2026-07-29 02:34:36'),
+(183, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 03:53:59', '2026-07-29 03:53:59'),
+(184, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 03:54:20', '2026-07-29 03:54:20'),
+(185, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:01:34', '2026-07-29 04:01:34'),
+(186, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:01:49', '2026-07-29 04:01:49'),
+(187, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:02:54', '2026-07-29 04:02:54'),
+(188, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:03:13', '2026-07-29 04:03:13'),
+(189, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:07:58', '2026-07-29 04:07:58'),
+(190, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:08:27', '2026-07-29 04:08:27'),
+(191, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:08:29', '2026-07-29 04:08:29'),
+(192, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 04:23:27', '2026-07-29 04:23:27'),
+(193, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 05:48:21', '2026-07-29 05:48:21'),
+(194, 1, 'wifi dan username', '127.0.0.1', '2026-07-29 05:48:34', '2026-07-29 05:48:34');
 
 -- --------------------------------------------------------
 
@@ -468,10 +577,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('5tfmGjZpZXgviYeIdZXhryIw2eY4e7367FiaVIPD', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiZldyWEs1U1NkZ3Z3UmlsVHZWSGVsV1ZNMnNzSFA1cXhDYm56eU9KZCI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozODoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2NhdGVnb3JpZXMiO31zOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czozNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Rhc2hib2FyZCI7czo1OiJyb3V0ZSI7czoxNToiYWRtaW4uZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1785230052),
-('Ac9olRkhIVtmr2L1PEww38Ecntef9a7zt2f6Fgtw', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicFljNlU2UHVNRjZCS1BHcmx1NnE2VUdKcjJqTW5iRldoQjB0RnFKaiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS9hcmVhLXJva29rP2xhbmc9aWQiO3M6NToicm91dGUiO3M6MTQ6Imd1ZXN0LmNhdGVnb3J5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1785289665),
-('s33rcqCyWG6CIs5FBzXCegN8NC9SNomhIrebvS4X', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiTmROaFI3ZjJkbWx4UFdEUGlIUk9YWHlVbEtycDBjVkJIeGhZNHJZRiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6MTU6ImFkbWluLmRhc2hib2FyZCI7fXM6MzoidXJsIjthOjE6e3M6ODoiaW50ZW5kZWQiO3M6MzM6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi91c2VycyI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1785230183),
-('xiRsINfBJ5x8WxnkaOOQRFjxOKN8ZanV4tz2G7nN', 2, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiWHdFckk2WEpQaDlMMzFLQWVsOGtDQlNnR3hSekpIMVNBeGRrWmZlViI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6MTU6ImFkbWluLmRhc2hib2FyZCI7fXM6MjA6ImFwcF9saWNlbnNlX3VubG9ja2VkIjtiOjE7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Rhc2hib2FyZCI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjI7czo0OiJsYW5nIjtzOjI6ImlkIjt9', 1785292358);
+('GoUmOjWN7MJXluvyjtriN2isRCNdnekqkIw5HDXG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoib1FNaHdBVlNVMXdnWVI2cTNvUFJ1UlNZVFRHWjdEQjd1RWtzOUI5dSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6MTU6ImFkbWluLmRhc2hib2FyZCI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1785312790),
+('MhbSdYEOkzgqs4UlREO7dgAl2nkOi0Q2OuxufoV8', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiR25jVU5iWkVTQWxtbks4MnVYeVFnN01LUVZOMmZ5YW9ibWZvQkdTaiI7czo0OiJsYW5nIjtzOjI6ImlkIjtzOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czoyMToiaHR0cDovLzEyNy4wLjAuMTo4MDAwIjtzOjU6InJvdXRlIjtzOjEwOiJndWVzdC5ob21lIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1785297288),
+('P75gt7R4Ur5C8EgstB6b6b75OYE9ttUFaLW2pGnI', NULL, '127.0.0.1', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNWJmNkFvQzdOYmNxWEtmd2JyZ1RXMUJseXdzcVFLM0o1V2FKczlZNCI7czo0OiJsYW5nIjtzOjI6ImlkIjtzOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czo1NjoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2NhdGVnb3J5L3dpZmktZGFuLXVzZXJuYW1lP2xhbmc9aWQiO3M6NToicm91dGUiO3M6MTQ6Imd1ZXN0LmNhdGVnb3J5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1785298115);
 
 -- --------------------------------------------------------
 
@@ -563,8 +671,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `avatar`, `password`, `role`, `is_active`, `last_login_at`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'paisal johen', 'johenfaisal3@gmail.com', NULL, 'avatars/ranHDslE5z49VtNAjCdnm1YXCvwBugymLQ5F9iEy.jpg', '$2y$12$YKw0e.kIGry29yhX1szpd.TV.MBcySg/EPWBzbZLzlaciv3cRvuP6', 'super_admin', 1, NULL, 'Yn6evHsFGlbsAjY5CyV31i4Xw31RcVRBLzfAgpuYpWKe7uIELR8O274PCNcY', '2026-07-08 01:19:13', '2026-07-28 08:43:58'),
-(2, 'admin OP', 'admin@mbahalaphotel.com', NULL, NULL, '$2y$12$A.3zuoJ8tlG1CSk0PK0KLus6RUvMDINegqQck/7a.XrPLK04vvlZS', 'admin', 1, NULL, NULL, '2026-07-08 01:19:14', '2026-07-23 07:33:48');
+(1, 'IT M Bahalap Hotel', 'super_admin@gmail.com', NULL, 'avatars/ranHDslE5z49VtNAjCdnm1YXCvwBugymLQ5F9iEy.jpg', '$2y$12$ckVDNcVYecCkMVZfLa61R.BEirT4ob6Vdl/dvqsPNOW9/bRQgIXOe', 'super_admin', 1, NULL, 'z9RPhFBttwih16Fs8VxsXRirjz5zb2iG6zweLmaKvN5xc96DBhoki6Nvzrba', '2026-07-08 01:19:13', '2026-07-29 04:10:44'),
+(2, 'admin OP', 'admin@mbahalaphotel.com', NULL, NULL, '$2y$12$GwBAJcJrUQDY47Xubyx6ses4QITcFdy96CUIkuiMOx1I6WsPAPCsy', 'admin', 1, NULL, NULL, '2026-07-08 01:19:14', '2026-07-29 04:11:20');
 
 --
 -- Indexes for dumped tables
@@ -727,7 +835,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=673;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=704;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -763,25 +871,25 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `guest_device_logs`
 --
 ALTER TABLE `guest_device_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=151;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
 
 --
 -- AUTO_INCREMENT for table `guest_favorites`
 --
 ALTER TABLE `guest_favorites`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `guest_language_logs`
 --
 ALTER TABLE `guest_language_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=294;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=339;
 
 --
 -- AUTO_INCREMENT for table `guest_views`
 --
 ALTER TABLE `guest_views`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=195;
 
 --
 -- AUTO_INCREMENT for table `jobs`
