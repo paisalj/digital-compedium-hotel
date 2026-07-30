@@ -18,20 +18,26 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-public function boot(): void
-{
-    $models = [
-        \App\Models\Content::class,
-        \App\Models\Category::class,
-        \App\Models\User::class,
-        \App\Models\Language::class, // Bahasa
-        \App\Models\Media::class,
-        \App\Models\Setting::class,
-        \App\Models\AiApiKey::class, // API Key
-    ];
+    public function boot(): void
+    {
+        // 2. TAMBAHKAN BLOK KODE HTTPS INI DI AWAL FUNGSI BOOT
+        if (env('APP_ENV') !== 'local') {
+            URL::forceScheme('https');
+        }
 
-    foreach ($models as $model) {
-        $model::observe(\App\Observers\GlobalObserver::class);
+        // KODE ASLI ANDA TETAP ADA DI BAWAHNYA
+        $models = [
+            \App\Models\Content::class,
+            \App\Models\Category::class,
+            \App\Models\User::class,
+            \App\Models\Language::class, // Bahasa
+            \App\Models\Media::class,
+            \App\Models\Setting::class,
+            \App\Models\AiApiKey::class, // API Key
+        ];
+
+        foreach ($models as $model) {
+            $model::observe(\App\Observers\GlobalObserver::class);
+        }
     }
-}
 }

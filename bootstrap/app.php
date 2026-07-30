@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        
+
+	$middleware->trustProxies(at: '*');
+
         // 1. Alias role middleware yang sudah ada
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
