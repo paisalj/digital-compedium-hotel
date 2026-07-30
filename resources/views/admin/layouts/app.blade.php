@@ -21,6 +21,23 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- CDN Bootstrap Icons (Sudah ada sebelumnya) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- TAMBAHKAN BLOK STYLE INI -->
+    <style>
+        .bi, [class^="bi-"], [class*=" bi-"] {
+            font-family: bootstrap-icons !important;
+            font-style: normal;
+            font-weight: normal !important;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1;
+            vertical-align: -0.125em;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+    
     @vite(['resources/css/app.css','resources/js/app.js'])
 
 
