@@ -187,7 +187,6 @@
 
 </td>
 
-    {{-- 🌐 PERBAIKAN NAMA: Mengambil terjemahan sesuai bahasa aktif --}}
 <td>
 
     <div class="font-semibold text-gray-900">
@@ -201,7 +200,6 @@
 
 </td>
 
-    {{-- 🌐 PERBAIKAN SLUG: Mengambil slug sesuai bahasa aktif --}}
     <td class="font-mono text-sm text-gray-500">
         {{ $category->translations->where('language.code', app()->getLocale())->first()->slug ?? $category->translations->first()->slug ?? '-' }}
     </td>
