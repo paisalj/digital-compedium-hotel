@@ -295,6 +295,15 @@ div.sticky * {
     color: #ffffff !important;
 }
 
+/* Memaksa warna teks input saat mode gelap aktif */
+    .dark .search-input-custom {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+    .search-input-custom {
+        color: #0f172a !important;
+    }
+
 </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
@@ -368,13 +377,30 @@ div.sticky * {
 </div>
 
 </div>
+
 <main class="flex-grow px-5 pt-6 pb-6 z-10 flex flex-col justify-start page-transition">
-    <h1 id="mainCategoryTitle" class="luxury-title text-2xl font-bold text-center border-b border-amber-200 pb-4">
-        {{ $categoryName }}
-    </h1>
+    
+<h1 id="mainCategoryTitle" class="luxury-title text-2xl font-bold text-center pb-2">
+    {{ $categoryName }}
+</h1>
+
+<!-- Input Pencarian -->
+<div class="px-2 mb-4">
+    <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </span>
+<input type="text" id="searchInput" onkeyup="searchContent()" placeholder="Cari informasi..."
+    class="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none search-input-custom">
+
+</div>
+</div>
+<div class="border-b border-amber-200 dark:border-amber-900/40 mx-4 mb-3"></div>
 
     <!-- KOTAK UTAMA -->
-    <div class="bg-white/50 dark:bg-slate-900/50 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-slate-800 mt-6">
+    <div class="bg-white/50 dark:bg-slate-900/50 rounded-2xl p-2 shadow-sm border border-gray-100 dark:border-slate-800 mt-4">
         
         <div class="flex items-center gap-2 mb-5 text-amber-800 dark:text-amber-400 px-2">
             <span class="text-base">📁</span> 
@@ -401,7 +427,7 @@ div.sticky * {
                     
                     <!-- KARTU KECIL (INDIVIDU) -->
                     <!-- Diberi id="content-{{ $item->id }}" agar bisa dideteksi saat diklik dari favorit -->
-                    <div class="relative bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm mt-4 {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s;">
+                    <div class="searchable-item relative bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm mt-4 {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s; ">
                         
                         <details class="group" name="accordion-info" id="content-{{ $item->id }}">
                             
@@ -734,6 +760,20 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     });
+
+    function searchContent() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    let items = document.querySelectorAll('.searchable-item');
+
+    items.forEach(item => {
+        let text = item.textContent.toLowerCase();
+        if (text.includes(input)) {
+            item.style.display = ""; // Tampilkan jika cocok
+        } else {
+            item.style.display = "none"; // Sembunyikan jika tidak cocok
+        }
+    });
+}
     
     </script>
     

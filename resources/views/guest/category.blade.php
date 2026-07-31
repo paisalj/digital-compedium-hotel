@@ -215,6 +215,15 @@ div.sticky * {
     -webkit-tap-highlight-color: transparent !important;
     outline: none !important;
 }
+/* Memaksa warna teks input saat mode gelap aktif */
+    .dark .search-input-custom {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+    .search-input-custom {
+        color: #0f172a !important;
+    }
+
         </style>
 </head>
 <body class="antialiased text-slate-800">
@@ -314,7 +323,20 @@ div.sticky * {
 
 </div>
 
-<main class="flex-grow px-5 pt-6 pb-6 z-10 flex flex-col justify-start page-transition">            
+<!-- Input Pencarian -->
+<div class="px-5 py-3 mb-4">
+    <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </span>
+<input type="text" id="searchInput" onkeyup="searchContent()" placeholder="Cari informasi..."
+    class="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none search-input-custom">
+
+    </div>
+</div>
+<main class="flex-grow px-5 pt-6 pb-6 z-10 flex flex-col justify-start page-transition ">            
             <!-- GRID DAFTAR KATEGORI (Posisi pertama) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 mb-8">
                 
@@ -342,7 +364,7 @@ div.sticky * {
 
 <!-- Tambahkan 'relative' di bagian class -->
 <a href="{{ route('guest.content', ['slug' => data_get($category, 'slug'), 'lang' => $currentLang]) }}" 
-   class="relative bg-white border border-slate-100 rounded-2xl p-5 md:p-6 flex flex-col items-center text-center shadow-xs hover:shadow-md md:hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-200 group card-animate">
+   class="searchable-item relative bg-white border border-slate-100 rounded-2xl p-5 md:p-6 flex flex-col items-center text-center shadow-xs hover:shadow-md md:hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-200 group card-animate">
    <!-- HAPUS SEMENTARA @auth dan @endauth -->
  
 {{-- Badge NONAKTIF (Hanya dirender jika status 0) --}}
@@ -596,6 +618,20 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+function searchContent() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    let items = document.querySelectorAll('.searchable-item');
+
+    items.forEach(item => {
+        let text = item.textContent.toLowerCase();
+        if (text.includes(input)) {
+            item.style.display = ""; // Tampilkan jika cocok
+        } else {
+            item.style.display = "none"; // Sembunyikan jika tidak cocok
+        }
+    });
+}
+    
             </script>
 </body>
 </html>
