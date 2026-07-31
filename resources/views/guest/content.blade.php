@@ -385,17 +385,25 @@ div.sticky * {
 </h1>
 
 <!-- Input Pencarian -->
-<div class="px-2 mb-4">
+@php
+    $lang = request()->get('lang', 'id');
+    $placeholder = match($lang) {
+        'en' => 'Search information...',
+        'dayak', 'ngaju' => 'manggau kabar...', 
+        default => 'Cari informasi...' 
+    };
+@endphp
+
+<div class="px-5 py-3 mb-4">
     <div class="relative">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
         </span>
-<input type="text" id="searchInput" onkeyup="searchContent()" placeholder="Cari informasi..."
-    class="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none search-input-custom">
-
-</div>
+        <input type="text" id="searchInput" onkeyup="searchContent()" placeholder="{{ $placeholder }}"
+            class="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none search-input-custom">
+    </div>
 </div>
 <div class="border-b border-amber-200 dark:border-amber-900/40 mx-4 mb-3"></div>
 
