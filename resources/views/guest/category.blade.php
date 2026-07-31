@@ -189,6 +189,32 @@
     .card-animate:nth-child(3) { animation-delay: 0.15s; }
     .card-animate:nth-child(4) { animation-delay: 0.2s; }
     .card-animate:nth-child(n+5) { animation-delay: 0.25s; }
+
+    /* Khusus Top Bar / Header: Matikan border kuning di Dark Mode */
+html.dark div.sticky {
+    border: none !important;
+    border-bottom: 1px solid #334155 !important; /* Hanya garis penyekat tipis di bawah */
+    box-shadow: none !important;
+}
+/* ========================================================= */
+/* MATIKAN EFEK BORDER & SHADOW KUNING TOP BAR SAAT DIKLIK   */
+/* ========================================================= */
+html.dark div.sticky,
+html.dark div.sticky:hover,
+html.dark div.sticky:focus,
+html.dark div.sticky:active {
+    border: none !important;
+    border-bottom: 1px solid #334155 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Menghilangkan sorotan klik bawaan browser HP / Webkit */
+div.sticky, 
+div.sticky * {
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+}
         </style>
 </head>
 <body class="antialiased text-slate-800">

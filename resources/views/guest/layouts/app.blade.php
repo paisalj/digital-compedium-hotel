@@ -14,8 +14,8 @@
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
     <!-- 🧭 TOP COMPENDIUM BAR -->
-    <nav class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+<nav class="bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">    
+<div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
             
             <!-- Logo & Brand (Aksen Emas) -->
             <a href="{{ route('guest.home') }}" class="flex items-center gap-2">
