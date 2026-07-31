@@ -29,9 +29,9 @@
     </div>
 @endif
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
+<div class="w-full overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+<table class="min-w-full border-separate border-spacing-0">
+            <thead class="bg-slate-300 border-b border-slate-400">
 <tr class="bg-gray-100 text-gray-700 uppercase text-sm">
     <th class="p-3 border">Nama</th>
     <th class="p-3 border">Email</th>
@@ -42,7 +42,7 @@
             </thead>
             <tbody>
                 @foreach($users as $user)
-                <tr class="border-b hover:bg-gray-50">
+<tr class="border-b odd:bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition">
                     <td class="p-3 border">{{ $user->name }}</td>
                     <td class="p-3 border">{{ $user->email }}</td>
 <td class="p-3 border">
