@@ -113,43 +113,49 @@
 <div class="bg-white p-6 rounded-lg shadow">
     <h3 class="text-xl font-bold mb-4">Riwayat Aktivitas</h3>
     
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-100 text-gray-700 uppercase text-sm">
-                    <th class="p-3 border">Waktu</th>
-                    <th class="p-3 border">User</th>
-                    <th class="p-3 border">Modul</th>
-                    <th class="p-3 border text-center">Aksi</th>
-                    <th class="p-3 border">Deskripsi</th>
-                    <th class="p-3 border">IP Address</th>
-                    <th class="p-3 border text-center">Opsi</th>
-                </tr>
-            </thead>
-            <tbody class="text-gray-600 text-sm">
-                @forelse($logs as $log)
-                <tr class="hover:bg-gray-50 border-b">
-                    <td class="p-3 border whitespace-nowrap">{{ $log->created_at->format('d M Y, H:i') }}</td>
-                    <td class="p-3 border font-medium text-gray-800">{{ $log->user->name ?? 'System' }}</td>
-                    <td class="p-3 border font-semibold">{{ $log->module }}</td>
-                    <td class="p-3 border text-center whitespace-nowrap">
-                        <!-- PART 4: Badge Warna untuk Aksi -->
+<div class="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <table class="min-w-full border-collapse">
+        <!-- Header Tabel (Disamakan dengan Kategori & User, tanpa garis kotak) -->
+        <thead class="bg-[#dce4ec] text-slate-700 text-xs font-bold uppercase tracking-wider">
+            <tr>
+                <th class="py-3.5 px-4 text-left">Waktu</th>
+                <th class="py-3.5 px-4 text-left">User</th>
+                <th class="py-3.5 px-4 text-left">Modul</th>
+                <th class="py-3.5 px-4 text-center">Aksi</th>
+                <th class="py-3.5 px-4 text-left">Deskripsi</th>
+                <th class="py-3.5 px-4 text-left">IP Address</th>
+                <th class="py-3.5 px-4 text-center">Opsi</th>
+            </tr>
+        </thead>
+
+        <!-- Isi Tabel (Garis pemisah horizontal halus antar-baris) -->
+        <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+            @forelse($logs as $log)
+<tr class="border-b odd:bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition">
+                    <td class="py-3 px-4 whitespace-nowrap">{{ $log->created_at->format('d M Y, H:i') }}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">{{ $log->user->name ?? 'System' }}</td>
+                    <td class="py-3 px-4 font-medium text-slate-700">{{ $log->module }}</td>
+                    
+                    <!-- Badge Aksi -->
+                    <td class="py-3 px-4 text-center whitespace-nowrap">
                         @php
                             $badgeColor = match(strtoupper($log->action)) {
-                                'CREATE' => 'bg-green-100 text-green-700 border-green-300',
+                                'CREATE' => 'bg-emerald-100 text-emerald-700 border-emerald-300',
                                 'UPDATE' => 'bg-blue-100 text-blue-700 border-blue-300',
                                 'DELETE' => 'bg-red-100 text-red-700 border-red-300',
-                                default  => 'bg-gray-100 text-gray-700 border-gray-300',
+                                default  => 'bg-slate-100 text-slate-700 border-slate-300',
                             };
                         @endphp
                         <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase border {{ $badgeColor }}">
                             {{ $log->action }}
                         </span>
                     </td>
-                    <td class="p-3 border">{{ $log->description }}</td>
-                    <td class="p-3 border text-gray-500 font-mono text-xs">{{ $log->ip_address ?? '-' }}</td>
-                    <td class="p-3 border text-center whitespace-nowrap">
-                        <!-- PART 5: Tombol Detail -->
+
+                    <td class="py-3 px-4 text-slate-600">{{ $log->description }}</td>
+                    <td class="py-3 px-4 text-slate-500 font-mono text-xs">{{ $log->ip_address ?? '-' }}</td>
+                    
+                    <!-- Tombol Detail -->
+                    <td class="py-3 px-4 text-center whitespace-nowrap">
                         <button type="button" 
                                 onclick="showDetailModal(this)"
                                 data-user="{{ $log->user->name ?? 'System' }}"
@@ -158,22 +164,21 @@
                                 data-description="{{ $log->formatted_description }}"
                                 data-time="{{ $log->created_at->format('d M Y, H:i:s') }}"
                                 data-ip="{{ $log->ip_address ?? '-' }}"
-                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs px-3 py-1.5 rounded border border-gray-300 transition shadow-sm">
+                                class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg border border-slate-300 transition shadow-sm">
                             DETAIL
                         </button>
                     </td>
                 </tr>
-                @empty
+            @empty
                 <tr>
-                    <td colspan="7" class="p-6 text-center text-gray-400">
+                    <td colspan="7" class="p-6 text-center text-slate-400">
                         Tidak ada aktivitas yang sesuai dengan filter/pencarian.
                     </td>
                 </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
+            @endforelse
+        </tbody>
+    </table>
+</div>
     <div class="mt-4">
         {{ $logs->links() }}
     </div>
