@@ -494,7 +494,8 @@ div.sticky * {
 favorites.forEach(fav => {
     html += `
         <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm transition">
-            <a href="${fav.url}" class="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-amber-500 truncate">
+            <!-- TAMBAHKAN ?open=${fav.id} DI SINI -->
+            <a href="${fav.url}?open=${fav.id}" class="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-amber-500 truncate">
                 ${fav.title}
             </a>
             <button onclick="removeFavorite('${fav.id}')" class="text-slate-400 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 p-1">
@@ -503,19 +504,17 @@ favorites.forEach(fav => {
         </div>
     `;
 });
-
 container.innerHTML = html;
     }
 
-    function removeFavoriteFromCategory(id) {
-        let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
-        favorites = favorites.filter(fav => fav.id !== id);
-        localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
-        
-        loadFavoritesToDrawer();
-        updateButtonStates();
-    }
-
+function removeFavorite(id) {
+    let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+    favorites = favorites.filter(fav => fav.id !== id);
+    localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
+    
+    loadFavoritesToDrawer();
+    updateButtonStates();
+}
     function updateButtonStates() {
         const buttons = document.querySelectorAll('.favorite-btn');
         let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];

@@ -264,6 +264,37 @@
     .card-animate:nth-child(3) { animation-delay: 0.15s; }
     .card-animate:nth-child(4) { animation-delay: 0.2s; }
     .card-animate:nth-child(n+5) { animation-delay: 0.25s; }
+        /* Khusus Top Bar / Header: Matikan border kuning di Dark Mode */
+html.dark div.sticky {
+    border: none !important;
+    border-bottom: 1px solid #334155 !important; /* Hanya garis penyekat tipis di bawah */
+    box-shadow: none !important;
+}
+/* ========================================================= */
+/* MATIKAN EFEK BORDER & SHADOW KUNING TOP BAR SAAT DIKLIK   */
+/* ========================================================= */
+html.dark div.sticky,
+html.dark div.sticky:hover,
+html.dark div.sticky:focus,
+html.dark div.sticky:active {
+    border: none !important;
+    border-bottom: 1px solid #334155 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Menghilangkan sorotan klik bawaan browser HP / Webkit */
+div.sticky, 
+div.sticky * {
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+}
+/* Memaksa seluruh teks di dalam konten menjadi putih saat Mode Malam / Dark Mode */
+.dark .custom-content-table, 
+.dark .custom-content-table * {
+    color: #ffffff !important;
+}
+
 </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
@@ -338,114 +369,121 @@
 
 </div>
 <main class="flex-grow px-5 pt-6 pb-6 z-10 flex flex-col justify-start page-transition">
-            <h1 id="mainCategoryTitle" class="luxury-title text-2xl font-bold text-center border-b border-amber-200 pb-4">
-            {{ $categoryName }}
-        </h1>
-        <div class="bg-white/50 rounded-2xl p-4 shadow-sm border border-gray-100">
-            
-            <div class="flex items-center gap-2 mb-5 text-amber-800 px-2">
-                <span class="text-base">📁</span> 
-                <h4 class="text-[11px] font-bold uppercase tracking-wider">
-                    {{ $currentLang == 'en' ? 'Information' : 'Informasi' }}
-                </h4>
-            </div>
+    <h1 id="mainCategoryTitle" class="luxury-title text-2xl font-bold text-center border-b border-amber-200 pb-4">
+        {{ $categoryName }}
+    </h1>
 
-            <!-- WRAPPER KARTU-KARTU KECIL -->
-            <div class="space-y-4">
-                @if(isset($contents) && $contents->count() > 0)
+    <!-- KOTAK UTAMA -->
+    <div class="bg-white/50 dark:bg-slate-900/50 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-slate-800 mt-6">
+        
+        <div class="flex items-center gap-2 mb-5 text-amber-800 dark:text-amber-400 px-2">
+            <span class="text-base">📁</span> 
+            <h4 class="text-[11px] font-bold uppercase tracking-wider">
+                {{ $currentLang == 'en' ? 'Information' : 'Informasi' }}
+            </h4>
+        </div>
+
+        <!-- WRAPPER KARTU-KARTU KECIL -->
+        <div class="space-y-4">
+            @if(isset($contents) && $contents->count() > 0)
+                @php
+                    $langMap = ['id' => 1, 'en' => 2, 'dayak' => 3];
+                    $targetLangId = $langMap[$currentLang] ?? 1;
+                @endphp
+
+                @foreach($contents as $item)
                     @php
-                        $langMap = ['id' => 1, 'en' => 2, 'dayak' => 3];
-                        $targetLangId = $langMap[$currentLang] ?? 1;
+                        $translation = $item->translations->firstWhere('language_id', $targetLangId);
+                        $delay = $loop->index * 0.08; 
                     @endphp
 
-     @foreach($contents as $item)
-    @php
-        $translation = $item->translations->firstWhere('language_id', $targetLangId);
-        // Pastikan baris ini ada di dalam blok @php
-        $delay = $loop->index * 0.08; 
-    @endphp
+                    @if($translation)
+                    
+                    <!-- KARTU KECIL (INDIVIDU) -->
+                    <!-- Diberi id="content-{{ $item->id }}" agar bisa dideteksi saat diklik dari favorit -->
+                    <div class="relative bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm mt-4 {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s;">
+                        
+                        <details class="group" name="accordion-info" id="content-{{ $item->id }}">
+                            
+                            <summary class="p-4 cursor-pointer list-none flex items-center justify-between pr-16 select-none">
+                                <div class="flex items-center gap-2 text-[14px] font-bold text-gray-800 dark:text-white">
+                                    @if($item->icon)
+                                        @if(filter_var($item->icon, FILTER_VALIDATE_URL))
+                                            <img src="{{ $item->icon }}" alt="icon" class="w-4 h-4 object-contain">
+                                        @elseif(str_contains($item->icon, 'bi-'))
+                                            <i class="{{ $item->icon }} text-amber-600 dark:text-amber-400 text-[16px]"></i>
+                                        @else
+                                            <img src="{{ asset('storage/' . $item->icon) }}" alt="icon" class="w-4 h-4 object-contain">
+                                        @endif
+                                    @else
+                                        <span class="text-[10px] text-amber-600 dark:text-amber-400">▶</span>
+                                    @endif
+                                    <span>{{ $translation->title }}</span>
+                                </div>
 
-    @if($translation)
-    
-<!-- KARTU KECIL (INDIVIDU) -->
-<!-- 1. Tambahkan 'relative' di sini agar badge absolute menempel dengan benar -->
-<div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s;">
-    <!-- 2. Tambahkan 'pr-16' pada h3 agar teks tidak menabrak badge di kanan -->
-    <h3 class="text-[14px] font-bold text-gray-800 mb-2 flex items-center gap-2 pr-16">
-                <!-- ICON DITAMPILKAN DI SINI -->
-        @if($item->icon)
-            @if(filter_var($item->icon, FILTER_VALIDATE_URL))
-                <img src="{{ $item->icon }}" alt="icon" class="w-4 h-4 object-contain">
-            @elseif(str_contains($item->icon, 'bi-'))
-                <i class="{{ $item->icon }} text-amber-600 text-[16px]"></i>
+                                <span class="transition-transform duration-300 group-open:rotate-180 text-amber-800 dark:text-amber-400 text-xs">
+                                    ▼
+                                </span>
+                            </summary>
+                            
+                            <!-- ISI KONTEN (TEKS PUTIH SAAT MODE MALAM) -->
+                            <div class="px-4 pb-4 text-[13px] text-gray-600 dark:text-white dark:[&_*]:text-white leading-relaxed custom-content-table overflow-x-auto pl-6 border-t border-gray-50 dark:border-slate-700 pt-3">
+                                {!! $translation->body !!}
+                            </div>
+
+                            <!-- FOOTER TANGGAL & JAM UPDATE -->
+                            <div class="px-4 py-3 border-t border-gray-50 dark:border-slate-700 text-[10px] text-gray-400 dark:text-gray-400 flex justify-end items-center gap-1 italic">
+                                <div>
+                                    @auth
+                                        @if(data_get($item, 'is_active') == 0)
+                                            <div class="inline-flex items-center bg-red-600 text-white font-bold px-2 py-0.5 rounded shadow-xs">
+                                                <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
+                                                NONAKTIF
+                                            </div>
+                                        @endif
+                                    @endauth
+                                </div>
+                                @if($translation->updated_at->diffInMinutes($translation->created_at) < 5)
+                                    <span>Dibuat:</span>
+                                    <span class="font-medium text-gray-500 dark:text-gray-300">
+                                        {{ $translation->created_at->translatedFormat('d F Y, H:i') }}
+                                    </span>
+                                @else
+                                    <span>Diperbarui:</span>
+                                    <span class="font-medium text-gray-500 dark:text-gray-300">
+                                        {{ $translation->updated_at->translatedFormat('d F Y, H:i') }}
+                                    </span>
+                                @endif
+                            </div>
+
+                        </details>
+
+                        <!-- TOMBOL BOOKMARK -->
+                        <button type="button" 
+                                onclick="event.stopPropagation(); toggleFavorite(this)" 
+                                data-id="{{ $item->id }}" 
+                                data-slug="{{ $translation->slug ?? '' }}"
+                                data-title="{{ $translation->title ?? '' }}" 
+                                data-url="{{ url()->current() }}"
+                                class="favorite-btn absolute top-3.5 right-4 p-1.5 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-300 hover:text-amber-500 transition-all cursor-pointer shadow-xs z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                        </button>
+
+                    </div>
+                    @endif
+                @endforeach
             @else
-                <img src="{{ asset('storage/' . $item->icon) }}" alt="icon" class="w-4 h-4 object-contain">
+                <div class="text-center py-10 text-gray-400">
+                    <p class="text-sm">Konten belum tersedia.</p>
+                </div>
             @endif
-        @else
-            <span class="text-[10px] text-amber-600">▶</span>
-        @endif
-        {{ $translation->title }}
-
-<!-- TOMBOL BOOKMARK -->
-<button type="button" 
-        onclick="toggleFavorite(this)" 
-        data-id="{{ $item->id }}" 
-        data-slug="{{ $translation->slug ?? '' }}"
-        data-title="{{ $translation->title ?? '' }}" 
-        data-url="{{ url()->current() }}"
-        class="favorite-btn absolute top-4 right-4 p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:text-amber-500 transition-all cursor-pointer shadow-xs z-10">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-    </svg>
-</button>
-
-</h3>
-    
-    <div class="text-[13px] text-gray-600 leading-relaxed custom-content-table overflow-x-auto pl-6">
-        {!! $translation->body !!}
+        </div>
+        
     </div>
-<!-- Footer Tanggal & Jam Update (Ambil dari $translation) -->
-<div class="mt-4 pt-3 border-t border-gray-50 text-[10px] text-gray-400 flex justify-end items-center gap-1 italic">
-
-<div>
-            @auth
-                @if(data_get($item, 'is_active') == 0)
-                    <div class="inline-flex items-center bg-red-600 text-white font-bold px-2 py-0.5 rounded shadow-xs">
-                        <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
-                        NONAKTIF
-                    </div>
-                @endif
-            @endauth
-        </div>
-    <!-- Logika: Jika updated_at hampir sama dengan created_at (selisih < 5 menit), berarti data asli -->
-    @if($translation->updated_at->diffInMinutes($translation->created_at) < 5)
-        <span>Dibuat:</span>
-        <span class="font-medium text-gray-500">
-            {{ $translation->created_at->translatedFormat('d F Y, H:i') }}
-        </span>
-    @else
-        <!-- Jika sudah pernah diupdate -->
-        <span>Diperbarui:</span>
-        <span class="font-medium text-gray-500">
-            {{ $translation->updated_at->translatedFormat('d F Y, H:i') }}
-        </span>
-    @endif
-</div>
-
-
-</div>
-                        @endif
-                    @endforeach
-                @else
-                    <div class="text-center py-10 text-gray-400">
-                        <p class="text-sm">Konten belum tersedia.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-        </main>
-
-        <footer class="py-4 text-center border-t border-gray-100 bg-white">
+</main>
+<footer class="py-4 text-center border-t border-gray-100 bg-white">
             <p class="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">
                 &copy; {{ date('Y') }} M Bahalap Hotel. All rights reserved.
             </p>
@@ -633,18 +671,35 @@ function toggleFavorite(button) {
         }
 
         // 7. Dark Mode Logic
-        function toggleDarkMode() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                updateThemeIcons('light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                updateThemeIcons('dark');
-            }
+const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon'); // Ikon Matahari
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');   // Ikon Bulan
+
+        // Cek status theme saat pertama kali halaman dimuat
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');     // Malam: Sembunyikan matahari
+            if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');    // Malam: Tampilkan bulan
+        } else {
+            document.documentElement.classList.remove('dark');
+            if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');    // Siang: Tampilkan matahari
+            if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');       // Siang: Sembunyikan bulan
         }
 
+        // Fungsi saat tombol diklik
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');
+                if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+            } else {
+                localStorage.setItem('theme', 'light');
+                if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+                if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');
+            }
+        }
+        
         function updateThemeIcons(theme) {
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
@@ -668,19 +723,18 @@ function toggleFavorite(button) {
             }
         }
 
-        // Inisialisasi Saat Halaman Dimuat (Hanya 1 blok DOMContentLoaded yang bersih)
-        document.addEventListener("DOMContentLoaded", function () {
-            const currentTheme = localStorage.getItem('theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            if (currentTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
+document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const openId = urlParams.get('open');
+        if (openId) {
+            const targetDetails = document.getElementById('content-' + openId);
+            if (targetDetails) {
+                targetDetails.open = true; // Otomatis membuka dropdown
+                targetDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Geser layar ke posisi tersebut
             }
-            updateThemeIcons(currentTheme);
-
-            loadFavoritesToDrawer();
-            updateButtonStates();
-        });
+        }
+    });
+    
     </script>
     
 </body>
