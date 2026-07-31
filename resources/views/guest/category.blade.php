@@ -336,7 +336,9 @@ div.sticky * {
 
     </div>
 </div>
-<main class="flex-grow px-5 pt-6 pb-6 z-10 flex flex-col justify-start page-transition ">            
+<div class="border-b border-amber-200 dark:border-amber-900/40 mx-4 mb-3"></div>
+
+<main class="flex-grow px-5 pt-6 pb-5 z-10 flex flex-col justify-start page-transition ">            
             <!-- GRID DAFTAR KATEGORI (Posisi pertama) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 mb-8">
                 
