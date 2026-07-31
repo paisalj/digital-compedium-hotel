@@ -325,11 +325,20 @@ div.sticky * {
 
 <!-- Input Pencarian -->
 @php
-    $lang = request()->get('lang', 'id');
-    $placeholder = match($lang) {
-        'en' => 'Search information...',
-        'dayak', 'ngaju' => 'manggau kabar...', 
-        default => 'Cari informasi...' 
+    $lang = request()->get('lang') ?? session('locale') ?? app()->getLocale();
+    $lang = strtolower(trim($lang));
+
+    $placeholder = match(true) {
+        in_array($lang, ['en', 'english']) => 'Search information...',
+        in_array($lang, ['dayak', 'ngaju', 'dayak-ngaju', 'dn', 'ng']) => 'Manggau barita...',
+        default => 'Cari informasi...'
+    };
+
+    // Teks pemberitahuan jika salah ketik / tidak ditemukan
+    $noResultText = match(true) {
+        in_array($lang, ['en', 'english']) => 'Search not found or misspelled. Please check your typing.',
+        in_array($lang, ['dayak', 'ngaju', 'dayak-ngaju', 'dn', 'ng']) => 'Manggau barita dia supa atau salah ejaan',
+        default => 'Pencarian tidak ditemukan atau salah ejaan.'
     };
 @endphp
 
@@ -343,8 +352,14 @@ div.sticky * {
         <input type="text" id="searchInput" onkeyup="searchContent()" placeholder="{{ $placeholder }}"
             class="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none search-input-custom">
     </div>
-</div>
 
+    <!-- PEMBERITAHUAN JIKA SALAH KETIK / TIDAK ADA -->
+    <div id="noResultsMessage" class="hidden mt-3 p-3 bg-amber-50 dark:bg-slate-800/50 border border-amber-200 dark:border-slate-700 rounded-xl text-center">
+        <p class="text-xs text-amber-600 dark:text-amber-400 font-medium">
+            <i class="bi bi-exclamation-triangle mr-1"></i> {{ $noResultText }}
+        </p>
+    </div>
+</div>
 <div class="border-b border-amber-200 dark:border-amber-900/40 mx-4 mb-3"></div>
 
 <main class="flex-grow px-5 pt-6 pb-5 z-10 flex flex-col justify-start page-transition ">            
@@ -630,17 +645,31 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 function searchContent() {
-    let input = document.getElementById('searchInput').value.toLowerCase();
-    let items = document.querySelectorAll('.searchable-item');
+    let input = document.getElementById('searchInput').value.toLowerCase().trim();
+    
+    // Pastikan setiap kotak kartu kategori/informasi Anda memiliki class "search-item"
+    let items = document.querySelectorAll('.search-item'); 
+    let visibleCount = 0;
 
     items.forEach(item => {
         let text = item.textContent.toLowerCase();
         if (text.includes(input)) {
-            item.style.display = ""; // Tampilkan jika cocok
+            item.style.display = ''; // Tampilkan jika cocok
+            visibleCount++;
         } else {
-            item.style.display = "none"; // Sembunyikan jika tidak cocok
+            item.style.display = 'none'; // Sembunyikan jika tidak cocok
         }
     });
+
+    // Munculkan peringatan jika hasil pencarian 0 dan kolom input tidak kosong
+    let noResultsEl = document.getElementById('noResultsMessage');
+    if (noResultsEl) {
+        if (visibleCount === 0 && input !== '') {
+            noResultsEl.classList.remove('hidden');
+        } else {
+            noResultsEl.classList.add('hidden');
+        }
+    }
 }
     
             </script>

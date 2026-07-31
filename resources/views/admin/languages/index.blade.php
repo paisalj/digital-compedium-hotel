@@ -260,7 +260,7 @@
 {{-- LIST DATA --}}
 @if($languages->count())
 
-<div class="overflow-x-auto">
+<div class="w-full overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
 
 <table class="w-full border-collapse">
 
