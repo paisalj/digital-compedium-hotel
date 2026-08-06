@@ -46,8 +46,11 @@
 
 <body class="bg-slate-100 font-[Poppins]">
 
-<div class="flex min-h-screen bg-slate-100" x-data="{ sidebarOpen: true }">
-    
+<div class="flex min-h-screen bg-slate-100" 
+     x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') === 'false' ? false : true }"
+     x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))">
+     
+     
     {{-- Sidebar --}}
     @include('admin.layouts.sidebar')
 
