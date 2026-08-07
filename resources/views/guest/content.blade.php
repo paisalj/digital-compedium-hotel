@@ -450,79 +450,82 @@ div.sticky * {
                     @if($translation)
                     
                     <!-- KARTU KECIL (INDIVIDU) -->
-                    <!-- Diberi id="content-{{ $item->id }}" agar bisa dideteksi saat diklik dari favorit -->
-                    <div class="searchable-item relative bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm mt-4 {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s; ">
-                        
-                        <details class="group" name="accordion-info" id="content-{{ $item->id }}">
-                            
-                            <summary class="p-4 cursor-pointer list-none flex items-center justify-between pr-16 select-none">
-                                <div class="flex items-center gap-2 text-[14px] font-bold text-gray-800 dark:text-white">
-                                    @if($item->icon)
-                                        @if(filter_var($item->icon, FILTER_VALIDATE_URL))
-                                            <img src="{{ $item->icon }}" alt="icon" class="w-4 h-4 object-contain">
-                                        @elseif(str_contains($item->icon, 'bi-'))
-                                            <i class="{{ $item->icon }} text-amber-600 dark:text-amber-400 text-[16px]"></i>
-                                        @else
-                                            <img src="{{ asset('storage/' . $item->icon) }}" alt="icon" class="w-4 h-4 object-contain">
-                                        @endif
-                                    @else
-                                        <span class="text-[10px] text-amber-600 dark:text-amber-400">▶</span>
-                                    @endif
-                                    <span>{{ $translation->title }}</span>
-                                </div>
-
-                                <span class="transition-transform duration-300 group-open:rotate-180 text-amber-800 dark:text-amber-400 text-xs">
-                                    ▼
-                                </span>
-                            </summary>
-                            
-                            <!-- ISI KONTEN (TEKS PUTIH SAAT MODE MALAM) -->
-                            <div class="px-4 pb-4 text-[13px] text-gray-600 dark:text-white dark:[&_*]:text-white leading-relaxed custom-content-table overflow-x-auto pl-6 border-t border-gray-50 dark:border-slate-700 pt-3">
-                                {!! $translation->body !!}
-                            </div>
-
-                            <!-- FOOTER TANGGAL & JAM UPDATE -->
-                            <div class="px-4 py-3 border-t border-gray-50 dark:border-slate-700 text-[10px] text-gray-400 dark:text-gray-400 flex justify-end items-center gap-1 italic">
-                                <div>
-                                    @auth
-                                        @if(data_get($item, 'is_active') == 0)
-                                            <div class="inline-flex items-center bg-red-600 text-white font-bold px-2 py-0.5 rounded shadow-xs">
-                                                <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
-                                                NONAKTIF
-                                            </div>
-                                        @endif
-                                    @endauth
-                                </div>
-                                @if($translation->updated_at->diffInMinutes($translation->created_at) < 5)
-                                    <span>Dibuat:</span>
-                                    <span class="font-medium text-gray-500 dark:text-gray-300">
-                                        {{ $translation->created_at->translatedFormat('d F Y, H:i') }}
-                                    </span>
-                                @else
-                                    <span>Diperbarui:</span>
-                                    <span class="font-medium text-gray-500 dark:text-gray-300">
-                                        {{ $translation->updated_at->translatedFormat('d F Y, H:i') }}
-                                    </span>
-                                @endif
-                            </div>
-
-                        </details>
-
-                        <!-- TOMBOL BOOKMARK -->
-                        <button type="button" 
-                                onclick="event.stopPropagation(); toggleFavorite(this)" 
-                                data-id="{{ $item->id }}" 
-                                data-slug="{{ $translation->slug ?? '' }}"
-                                data-title="{{ $translation->title ?? '' }}" 
-                                data-url="{{ url()->current() }}"
-                                class="favorite-btn absolute top-3.5 right-4 p-1.5 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-300 hover:text-amber-500 transition-all cursor-pointer shadow-xs z-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                        </button>
-
-                    </div>
+<!-- KARTU KECIL (INDIVIDU) -->
+<div class="searchable-item relative bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm mt-4 {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s;">
+    
+    <details class="group" name="accordion-info" id="content-{{ $item->id }}">
+        
+        <summary class="p-4 cursor-pointer list-none flex items-center justify-between select-none">
+            <!-- Judul & Ikon di Sebelah Kiri -->
+            <div class="flex items-center gap-2 text-[14px] font-bold text-gray-800 dark:text-white pr-2">
+                @if($item->icon)
+                    @if(filter_var($item->icon, FILTER_VALIDATE_URL))
+                        <img src="{{ $item->icon }}" alt="icon" class="w-4 h-4 object-contain">
+                    @elseif(str_contains($item->icon, 'bi-'))
+                        <i class="{{ $item->icon }} text-amber-600 dark:text-amber-400 text-[16px]"></i>
+                    @else
+                        <img src="{{ asset('storage/' . $item->icon) }}" alt="icon" class="w-4 h-4 object-contain">
                     @endif
+                @else
+                    <span class="text-[10px] text-amber-600 dark:text-amber-400">▶</span>
+                @endif
+                <span>{{ $translation->title }}</span>
+            </div>
+
+            <!-- Tombol Bookmark & Panah di Sebelah Kanan (Sejajar di Header) -->
+            <div class="flex items-center gap-2">
+                <button type="button" 
+                        onclick="event.stopPropagation(); toggleFavorite(this)" 
+                        data-id="{{ $item->id }}" 
+                        data-slug="{{ $translation->slug ?? '' }}"
+                        data-title="{{ $translation->title ?? '' }}" 
+                        data-url="{{ url()->current() }}"
+                        class="favorite-btn p-1.5 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-300 hover:text-amber-500 transition-all cursor-pointer shadow-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                </button>
+
+                <span class="transition-transform duration-300 group-open:rotate-180 text-amber-800 dark:text-amber-400 text-xs">
+                    ▼
+                </span>
+            </div>
+        </summary>
+        
+        <!-- ISI KONTEN (Teks aman di bawah header, tidak akan tertutup tombol lagi) -->
+<!-- ISI KONTEN -->
+<div class="px-5 pb-4 text-[13px] text-gray-600 dark:text-white dark:[&_*]:text-white leading-relaxed custom-content-table border-t border-gray-50 dark:border-slate-700 pt-3 space-y-3">
+    {!! $translation->body !!}
+</div>
+        <!-- FOOTER TANGGAL & JAM UPDATE -->
+        <div class="px-4 py-3 border-t border-gray-50 dark:border-slate-700 text-[10px] text-gray-400 dark:text-gray-400 flex justify-end items-center gap-1 italic">
+            <div>
+                @auth
+                    @if(data_get($item, 'is_active') == 0)
+                        <div class="inline-flex items-center bg-red-600 text-white font-bold px-2 py-0.5 rounded shadow-xs">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
+                            NONAKTIF
+                        </div>
+                    @endif
+                @endauth
+            </div>
+            @if($translation->updated_at->diffInMinutes($translation->created_at) < 5)
+                <span>Dibuat:</span>
+                <span class="font-medium text-gray-500 dark:text-gray-300">
+                    {{ $translation->created_at->translatedFormat('d F Y, H:i') }}
+                </span>
+            @else
+                <span>Diperbarui:</span>
+                <span class="font-medium text-gray-500 dark:text-gray-300">
+                    {{ $translation->updated_at->translatedFormat('d F Y, H:i') }}
+                </span>
+            @endif
+        </div>
+
+    </details>
+</div>
+
+@endif
                 @endforeach
             @else
                 <div class="text-center py-10 text-gray-400">
@@ -774,44 +777,61 @@ const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         }
 
 document.addEventListener("DOMContentLoaded", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const openId = urlParams.get('open');
-        if (openId) {
-            const targetDetails = document.getElementById('content-' + openId);
-            if (targetDetails) {
-                targetDetails.open = true; // Otomatis membuka dropdown
-                targetDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Geser layar ke posisi tersebut
-            }
+    // 1. Cek parameter 'open' untuk buka accordion (kode sebelumnya)
+    const urlParams = new URLSearchParams(window.location.search);
+    const openId = urlParams.get('open');
+    if (openId) {
+        const targetDetails = document.getElementById('content-' + openId);
+        if (targetDetails) {
+            targetDetails.open = true; 
+            targetDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+        }
+    }
+
+    // 2. Sinkronkan status tombol favorite & drawer
+    if (typeof updateButtonStates === 'function') updateButtonStates();
+    if (typeof loadFavoritesToDrawer === 'function') loadFavoritesToDrawer();
+
+    // 3. BARU: Otomatis bungkus tabel agar hanya tabelnya saja yang bisa di-scroll horizontal
+    document.querySelectorAll('.custom-content-table table').forEach(table => {
+        // Cek apakah tabel sudah dibungkus sebelumnya agar tidak double
+        if (!table.parentElement.classList.contains('overflow-x-auto')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'overflow-x-auto w-full my-2';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
         }
     });
+});
 
 function searchContent() {
-    let input = document.getElementById('searchInput').value.toLowerCase().trim();
-    
-    // Pastikan setiap kotak kartu kategori/informasi Anda memiliki class "search-item"
-    let items = document.querySelectorAll('.search-item'); 
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase().trim();
+    const items = document.querySelectorAll('.searchable-item');
+    const noResultsMsg = document.getElementById('noResultsMessage');
     let visibleCount = 0;
 
     items.forEach(item => {
-        let text = item.textContent.toLowerCase();
-        if (text.includes(input)) {
-            item.style.display = ''; // Tampilkan jika cocok
+        // Mengambil seluruh teks di dalam kartu (judul, isi, dll) dan ubah ke huruf kecil
+        const text = item.textContent.toLowerCase();
+        
+        // Cek apakah teks mengandung kata yang diketik di input
+        if (text.includes(filter)) {
+            item.style.display = ''; // Tampilkan kembali
             visibleCount++;
         } else {
             item.style.display = 'none'; // Sembunyikan jika tidak cocok
         }
     });
 
-    // Munculkan peringatan jika hasil pencarian 0 dan kolom input tidak kosong
-    let noResultsEl = document.getElementById('noResultsMessage');
-    if (noResultsEl) {
-        if (visibleCount === 0 && input !== '') {
-            noResultsEl.classList.remove('hidden');
-        } else {
-            noResultsEl.classList.add('hidden');
-        }
+    // Menampilkan atau menyembunyikan pesan "Pencarian tidak ditemukan"
+    if (visibleCount === 0 && filter !== '') {
+        noResultsMsg.classList.remove('hidden');
+    } else {
+        noResultsMsg.classList.add('hidden');
     }
 }
+
     
     </script>
     
