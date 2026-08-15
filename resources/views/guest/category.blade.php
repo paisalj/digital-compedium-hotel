@@ -647,8 +647,8 @@ document.addEventListener("DOMContentLoaded", function () {
 function searchContent() {
     let input = document.getElementById('searchInput').value.toLowerCase().trim();
     
-    // Pastikan setiap kotak kartu kategori/informasi Anda memiliki class "search-item"
-    let items = document.querySelectorAll('.search-item'); 
+    // Ubah dari '.search-item' menjadi '.searchable-item'
+    let items = document.querySelectorAll('.searchable-item'); 
     let visibleCount = 0;
 
     items.forEach(item => {
