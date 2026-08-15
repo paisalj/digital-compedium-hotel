@@ -654,7 +654,7 @@ function searchContent() {
     items.forEach(item => {
         let text = item.textContent.toLowerCase();
         if (text.includes(input)) {
-            item.style.display = ''; // Tampilkan jika cocok
+            item.style.display = ''; 
             visibleCount++;
         } else {
             item.style.display = 'none'; // Sembunyikan jika tidak cocok
