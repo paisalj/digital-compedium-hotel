@@ -179,11 +179,11 @@
     </td>
 <td>
 
-<div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center">
+        <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center">
 
-    <i class="{{ $category->icon }} text-yellow-600 text-lg"></i>
+            <i class="{{ $category->icon }} text-yellow-600 text-lg"></i>
 
-</div>
+        </div>
 
 </td>
 
