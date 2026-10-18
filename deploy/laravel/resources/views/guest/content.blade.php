@@ -1,0 +1,839 @@
+@php
+    // Mengambil bahasa aktif saat ini dari URL atau Session
+    $currentLang = request('lang', session('lang', 'en'));
+@endphp
+
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Mengambil title dari database -->
+    <title>{{ $content->title ?? $content['title'] ?? 'Detail - M Bahalap Hotel' }}</title>
+    <link rel="icon" type="image/png" href="{{ isset($settings['hotel_logo']) && $settings['hotel_logo'] ? asset('storage/' . $settings['hotel_logo']) : asset('images/default-logo.png') }}">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons (Tambahan agar ikon muncul) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Tailwind CSS (Vite) -->
+    @vite('resources/css/app.css')
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9fafb;
+            background-image: linear-gradient(rgba(230, 255, 255, 0.82), rgba(230, 255, 255, 0.82)), 
+                              url('{{ isset($settings["hotel_background"]) && $settings["hotel_background"] ? asset("storage/" . $settings["hotel_background"]) : asset("images/default-bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none;    /* IE 10 and IE 11 */
+            user-select: none;        /* Standard syntax */
+        }
+        .luxury-title {
+            font-family: 'Cinzel', serif;
+            color: #b78b2d;
+            letter-spacing: 1px;
+        }
+        .btn-back {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+        .btn-back:active {
+            transform: scale(0.95);
+        }
+        /* Custom scrollbar halus untuk konten panjang */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #e5e7eb;
+            border-radius: 4px;
+        }
+        /* Styling agar tabel di dalam konten terlihat rapi dan tidak polos */
+        .custom-content-table table {
+            width: auto; /* Agar tabel menyesuaikan isi konten */
+            min-width: 100%; /* Tetap minimal selebar layar */
+            border-collapse: collapse;
+        }
+
+        .custom-content-table th, .custom-content-table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px 15px; /* Memberi ruang napas yang lebih lega */
+            text-align: left;
+            white-space: nowrap; /* KUNCI: Mencegah teks patah ke bawah */
+        }
+
+        .custom-content-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .custom-content-table td {
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        /* Memastikan gambar tetap rapi */
+/* Memastikan gambar mengikuti ukuran dari dashboard & aman di HP */
+        .custom-content-table img {
+            max-width: 100%;    /* Batas maksimal: tidak akan keluar/jebol dari lebar layar HP */
+            width: auto;        /* Mengikuti ukuran width yang kamu setel di dashboard */
+            height: auto;       /* Menjaga proporsi gambar agar tidak gepeng */
+            border-radius: 6px;
+            display: block;
+            margin: 10px auto;  /* Posisi gambar otomatis berada di tengah */
+        }
+        
+        .custom-content-table p {
+            margin-bottom: 1rem !important;
+        }
+        
+        /* Menebalkan sedikit sub-judul jika ada di dalam teks */
+        .custom-content-table strong {
+            color: #374151; 
+        }
+        .custom-content-table ul {
+            list-style-type: disc !important;
+            padding-left: 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+
+        /* Memberi jarak pada item list agar tidak rapat */
+        .custom-content-table li {
+            list-style-type: disc !important;
+            margin-bottom: 0.5rem !important;
+            padding-left: 0.5rem !important;
+        }
+
+        /* Jika ada list bernomor (ordered list) */
+        .custom-content-table ol {
+            list-style-type: decimal !important;
+            padding-left: 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+
+        /*  */
+/* ========================================================= */
+        /* DARK MODE HIDUP & ELEGAN (CATEGORY)                      */
+        /* ========================================================= */
+        
+        /* 1. Background utama lebih transparan agar wallpaper hotel kelihatan hidup */
+        html.dark body {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.90), rgba(15, 23, 42, 0.90)), 
+                              url('{{ isset($settings['hotel_background']) && $settings['hotel_background'] ? asset("storage/" . $settings['hotel_background']) : asset("assets/img/default_bg.jpg") }}') !important;
+        }
+
+        /* 2. Kartu Menu / Kategori (Lebih terang, ada efek gradasi & border emas elegan) */
+        html.dark .bg-white,
+        html.dark div[class*="bg-white"] {
+            background: linear-gradient(145deg, #1e293b, #0f172a) !important;
+            border: 1px solid rgba(197, 154, 54, 0.4) !important; /* Border emas tipis menyala */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Efek hover saat kartu disentuh */
+        html.dark .bg-white:hover,
+        html.dark div[class*="bg-white"]:hover {
+            border-color: #fbbf24 !important;
+            box-shadow: 0 10px 25px rgba(197, 154, 54, 0.25) !important;
+        }
+
+        /* 3. Teks di dalam kartu & halaman agar terang & tajam */
+        html.dark span, 
+        html.dark p, 
+        html.dark h3,
+        html.dark a {
+            color: #f3f4f6 !important;
+        }
+
+        /* 4. Memperbaiki Tombol "Favorit" agar teksnya terlihat jelas di mode malam */
+        html.dark a[href*="favorit"],
+        html.dark button[class*="favorit"],
+        html.dark .btn-favorit {
+            background-color: #1e293b !important;
+            border: 1px solid #c59a36 !important;
+            color: #ffffff !important;
+        }
+
+        /* 5. Memperbaiki Tombol / Dropdown Bahasa agar kontras & hidup */
+        html.dark .btn-bahasa,
+        html.dark #btnDropdownLang {
+            background-color: #1e293b !important;
+            border-color: #c59a36 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark #boxDropdownLang {
+            background-color: #1e293b !important;
+            border-color: #c59a36 !important;
+        }
+
+        html.dark #boxDropdownLang a {
+            color: #ffffff !important;
+        }
+
+        html.dark #boxDropdownLang a:hover {
+            background-color: #334155 !important;
+            color: #fbbf24 !important;
+        }
+
+        /* 6. Kotak Bantuan WhatsApp di Bagian Bawah */
+        html.dark div[style*="background-color: white"],
+        html.dark .help-section {
+            background: linear-gradient(135deg, #1e293b, #111827) !important;
+            border: 1px solid rgba(197, 154, 54, 0.5) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* 7. Tombol Toggle Mode */
+        html.dark #theme-toggle {
+            background-color: #1e293b !important;
+            border-color: #c59a36 !important;
+            color: #f3f4f6 !important;
+        }
+        /* 1. Mengubah tombol Favorit & Tombol Bahasa agar gelap dan tidak silau saat Mode Malam */
+    html.dark .btn-favorit,
+    html.dark .btn-bahasa,
+    html.dark #btnDropdownLang {
+        background-color: #1e293b !important;
+        border-color: #c59a36 !important;
+        color: #f3f4f6 !important;
+    }
+
+    /* 2. Mengubah kotak menu dropdown bahasa agar latar belakangnya gelap */
+    html.dark #boxDropdownLang {
+        background-color: #1e293b !important;
+        border: 1px solid #c59a36 !important;
+    }
+
+    /* 3. Mengubah teks pilihan bahasa di dalam dropdown agar kontras dan terbaca jelas */
+    html.dark #boxDropdownLang a {
+        color: #f3f4f6 !important;
+    }
+
+/* Memaksa item bahasa yang aktif di dropdown agar tidak silau saat Dark Mode */
+    html.dark #boxDropdownLang a[style*="background-color"] {
+        background-color: #334155 !important;
+        color: #fbbf24 !important;
+    }
+    
+    /* Efek hover saat disentuh di mode malam */
+    html.dark #boxDropdownLang a:hover {
+        background-color: #334155 !important;
+        color: #fbbf24 !important;
+    }
+
+    #stickyCategoryTitle {
+        color: #111827 !important;
+    }
+
+    /* Mode Gelap: Teks judul kategori otomatis jadi terang */
+    .dark #stickyCategoryTitle {
+        color: #f3f4f6 !important;
+    }
+@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .page-transition {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .card-animate {
+        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+    .card-animate:nth-child(1) { animation-delay: 0.05s; }
+    .card-animate:nth-child(2) { animation-delay: 0.1s; }
+    .card-animate:nth-child(3) { animation-delay: 0.15s; }
+    .card-animate:nth-child(4) { animation-delay: 0.2s; }
+    .card-animate:nth-child(n+5) { animation-delay: 0.25s; }
+        /* Khusus Top Bar / Header: Matikan border kuning di Dark Mode */
+html.dark div.sticky {
+    border: none !important;
+    border-bottom: 1px solid #334155 !important; /* Hanya garis penyekat tipis di bawah */
+    box-shadow: none !important;
+}
+/* ========================================================= */
+/* MATIKAN EFEK BORDER & SHADOW KUNING TOP BAR SAAT DIKLIK   */
+/* ========================================================= */
+html.dark div.sticky,
+html.dark div.sticky:hover,
+html.dark div.sticky:focus,
+html.dark div.sticky:active {
+    border: none !important;
+    border-bottom: 1px solid #334155 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Menghilangkan sorotan klik bawaan browser HP / Webkit */
+div.sticky, 
+div.sticky * {
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+}
+/* Memaksa seluruh teks di dalam konten menjadi putih saat Mode Malam / Dark Mode */
+.dark .custom-content-table, 
+.dark .custom-content-table * {
+    color: #ffffff !important;
+}
+
+/* Memaksa warna teks input saat mode gelap aktif */
+    .dark .search-input-custom {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+    .search-input-custom {
+        color: #0f172a !important;
+    }
+
+</style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- WRAPPER UTAMA -->
+<div class="min-h-screen w-full mx-auto shadow-2xl relative flex flex-col bg-transparent">        
+        <div class="bg-pattern"></div>
+
+        <div class="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-xs" style="background-color: white; border-bottom: 1px solid #f1f5f9; padding: 0 20px; height: 56px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+            
+            <a href="{{ url('/category/' . $category->slug . '?lang=' . $currentLang) }}" class="hover:opacity-80 active:scale-95 transition-all" style="display: flex; align-items: center; gap: 4px; text-decoration: none; color: #c59a36; font-size: 14px; font-weight: 600;">
+                <i class="bi bi-chevron-left" style="-webkit-text-stroke: 0.5px; font-size: 13px; transform: translateY(1px);"></i>
+                <span>
+                    @if($currentLang == 'en')
+                        Back
+                    @elseif($currentLang == 'dayak')
+                        Haluli
+                    @else
+                        Kembali
+                    @endif
+                </span>
+            </a>
+
+<!-- Bagian Kanan: Tombol Dark Mode & Dropdown Bahasa -->
+<div style="position: relative; z-index: 50; display: flex; align-items: center; gap: 4px;">
+    
+<!-- 🌙 TOMBOL GANTI MODE (Border ditebalkan jadi 2px) -->
+    <button id="theme-toggle" onclick="toggleDarkMode()" type="button" 
+            style="width: 30px; height: 30px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; background: #ffffff; border: 2px solid #d1d5db; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0;">
+        
+        <!-- Ikon Matahari (Mode Siang) -->
+        <svg id="theme-toggle-light-icon" class="hidden" style="width: 15px; height: 15px; color: #f59e0b;" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+        </svg>
+        
+        <!-- Ikon Bulan (Mode Malam) -->
+        <svg id="theme-toggle-dark-icon" class="hidden" style="width: 15px; height: 15px; color: #fbbf24; transform: scaleX(-1);" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+
+    </button>
+    
+    <!-- Dropdown Bahasa Container -->
+    <div style="position: relative; display: flex; align-items: center;">
+        <button type="button" id="btnDropdownLang" onclick="toggleLangDropdown(event)" 
+                class="btn-bahasa" 
+                style="padding: 0 10px; height: 30px; font-size: 12px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; gap: 4px; background: white; border: 1px solid #e5e7eb; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-weight: 700; color: #374151; box-sizing: border-box;">
+            <span style="font-size: 14px; display: flex; align-items: center;">🌐</span> 
+            <span style="display: flex; align-items: center; line-height: 1;">{{ strtoupper($currentLang == 'dayak' ? 'DK' : $currentLang) }}</span>
+            <svg style="width: 10px; height: 10px; color: #6b7280; transition: transform 0.2s; display: flex; align-items: center;" id="arrowDropdownLang" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+
+        <div id="boxDropdownLang" class="hidden" 
+             style="position: absolute; right: 0; top: 100%; margin-top: 8px; width: 140px; border-radius: 10px; background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; z-index: 100;">
+            <div style="padding: 4px 0;">
+                <a href="?lang=id" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #374151; text-decoration: none; font-weight: 600; {{ $currentLang == 'id' ? 'background-color: #fef3c7; color: #c59a36; font-weight: bold;' : '' }}">
+                    <span>ID</span> Indonesia
+                </a>
+                <a href="?lang=en" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #374151; text-decoration: none; font-weight: 600; {{ $currentLang == 'en' ? 'background-color: #fef3c7; color: #c59a36; font-weight: bold;' : '' }}">
+                    <span>EN</span> English
+                </a>
+                <a href="?lang=dayak" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #374151; text-decoration: none; font-weight: 600; {{ $currentLang == 'dayak' ? 'background-color: #fef3c7; color: #c59a36; font-weight: bold;' : '' }}">
+                    <span>DK</span> Dayak
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+<main class="flex-grow px-5 pt-6 pb-6 z-10 flex flex-col justify-start page-transition">
+    
+<h1 id="mainCategoryTitle" class="luxury-title text-2xl font-bold text-center pb-2">
+    {{ $categoryName }}
+</h1>
+
+<!-- Input Pencarian -->
+@php
+    $lang = request()->get('lang') ?? session('locale') ?? app()->getLocale();
+    $lang = strtolower(trim($lang));
+
+    $placeholder = match(true) {
+        in_array($lang, ['en', 'english']) => 'Search information...',
+        in_array($lang, ['dayak', 'ngaju', 'dayak-ngaju', 'dn', 'ng']) => 'Manggau barita...',
+        default => 'Cari informasi...'
+    };
+
+    // Teks pemberitahuan jika salah ketik / tidak ditemukan
+    $noResultText = match(true) {
+        in_array($lang, ['en', 'english']) => 'Search not found or misspelled. Please check your typing.',
+        in_array($lang, ['dayak', 'ngaju', 'dayak-ngaju', 'dn', 'ng']) => 'Manggau barita dia supa atau salah ejaan',
+        default => 'Pencarian tidak ditemukan atau salah ejaan.'
+    };
+@endphp
+
+<div class="px-4 py-3 mb-4">
+    <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </span>
+        <input type="text" id="searchInput" onkeyup="searchContent()" placeholder="{{ $placeholder }}"
+            class="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none search-input-custom">
+    </div>
+
+    <!-- PEMBERITAHUAN JIKA SALAH KETIK / TIDAK ADA -->
+    <div id="noResultsMessage" class="hidden mt-3 p-3 bg-amber-50 dark:bg-slate-800/50 border border-amber-200 dark:border-slate-700 rounded-xl text-center">
+        <p class="text-xs text-amber-600 dark:text-amber-400 font-medium">
+            <i class="bi bi-exclamation-triangle mr-1"></i> {{ $noResultText }}
+        </p>
+    </div>
+</div>
+<div class="border-b border-amber-200 dark:border-amber-900/40 mx-4 mb-3"></div>
+
+    <!-- KOTAK UTAMA -->
+    <div class="bg-white/50 dark:bg-slate-900/50 rounded-2xl p-2 shadow-sm border border-gray-100 dark:border-slate-800 mt-4">
+        
+        <div class="flex items-center gap-2 mb-5 text-amber-800 dark:text-amber-400 px-2">
+            <span class="text-base">📁</span> 
+            <h4 class="text-[11px] font-bold uppercase tracking-wider">
+                {{ $currentLang == 'en' ? 'Information' : 'Informasi' }}
+            </h4>
+        </div>
+
+        <!-- WRAPPER KARTU-KARTU KECIL -->
+        <div class="space-y-4">
+            @if(isset($contents) && $contents->count() > 0)
+                @php
+                    $langMap = ['id' => 1, 'en' => 2, 'dayak' => 3];
+                    $targetLangId = $langMap[$currentLang] ?? 1;
+                @endphp
+
+                @foreach($contents as $item)
+                    @php
+                        $translation = $item->translations->firstWhere('language_id', $targetLangId);
+                        $delay = $loop->index * 0.08; 
+                    @endphp
+
+                    @if($translation)
+                    
+                    <!-- KARTU KECIL (INDIVIDU) -->
+<!-- KARTU KECIL (INDIVIDU) -->
+<div class="searchable-item relative bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm mt-4 {{ data_get($item, 'is_active') == 0 ? 'opacity-60 grayscale' : '' }} card-animate" style="animation-delay: {{ $delay }}s;">
+    
+    <details class="group" name="accordion-info" id="content-{{ $item->id }}">
+        
+        <summary class="p-4 cursor-pointer list-none flex items-center justify-between select-none">
+            <!-- Judul & Ikon di Sebelah Kiri -->
+            <div class="flex items-center gap-2 text-[14px] font-bold text-gray-800 dark:text-white pr-2">
+                @if($item->icon)
+                    @if(filter_var($item->icon, FILTER_VALIDATE_URL))
+                        <img src="{{ $item->icon }}" alt="icon" class="w-4 h-4 object-contain">
+                    @elseif(str_contains($item->icon, 'bi-'))
+                        <i class="{{ $item->icon }} text-amber-600 dark:text-amber-400 text-[16px]"></i>
+                    @else
+                        <img src="{{ asset('storage/' . $item->icon) }}" alt="icon" class="w-4 h-4 object-contain">
+                    @endif
+                @else
+                    <span class="text-[10px] text-amber-600 dark:text-amber-400">▶</span>
+                @endif
+                <span>{{ $translation->title }}</span>
+            </div>
+
+            <!-- Tombol Bookmark & Panah di Sebelah Kanan (Sejajar di Header) -->
+            <div class="flex items-center gap-2">
+                <button type="button" 
+                        onclick="event.stopPropagation(); toggleFavorite(this)" 
+                        data-id="{{ $item->id }}" 
+                        data-slug="{{ $translation->slug ?? '' }}"
+                        data-title="{{ $translation->title ?? '' }}" 
+                        data-url="{{ url()->current() }}"
+                        class="favorite-btn p-1.5 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-300 hover:text-amber-500 transition-all cursor-pointer shadow-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                </button>
+
+                <span class="transition-transform duration-300 group-open:rotate-180 text-amber-800 dark:text-amber-400 text-xs">
+                    ▼
+                </span>
+            </div>
+        </summary>
+        
+        <!-- ISI KONTEN (Teks aman di bawah header, tidak akan tertutup tombol lagi) -->
+<!-- ISI KONTEN -->
+<div class="px-5 pb-4 text-[13px] text-gray-600 dark:text-white dark:[&_*]:text-white leading-relaxed custom-content-table border-t border-gray-50 dark:border-slate-700 pt-3 space-y-3">
+    {!! $translation->body !!}
+</div>
+        <!-- FOOTER TANGGAL & JAM UPDATE -->
+        <div class="px-4 py-3 border-t border-gray-50 dark:border-slate-700 text-[10px] text-gray-400 dark:text-gray-400 flex justify-end items-center gap-1 italic">
+            <div>
+                @auth
+                    @if(data_get($item, 'is_active') == 0)
+                        <div class="inline-flex items-center bg-red-600 text-white font-bold px-2 py-0.5 rounded shadow-xs">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
+                            NONAKTIF
+                        </div>
+                    @endif
+                @endauth
+            </div>
+            @if($translation->updated_at->diffInMinutes($translation->created_at) < 5)
+                <span>Dibuat:</span>
+                <span class="font-medium text-gray-500 dark:text-gray-300">
+                    {{ $translation->created_at->translatedFormat('d F Y, H:i') }}
+                </span>
+            @else
+                <span>Diperbarui:</span>
+                <span class="font-medium text-gray-500 dark:text-gray-300">
+                    {{ $translation->updated_at->translatedFormat('d F Y, H:i') }}
+                </span>
+            @endif
+        </div>
+
+    </details>
+</div>
+
+@endif
+                @endforeach
+            @else
+                <div class="text-center py-10 text-gray-400">
+                    <p class="text-sm">Konten belum tersedia.</p>
+                </div>
+            @endif
+        </div>
+        
+    </div>
+</main>
+<footer class="py-4 text-center border-t border-gray-100 bg-white">
+            <p class="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">
+                &copy; {{ date('Y') }} M Bahalap Hotel. All rights reserved.
+            </p>
+        </footer>
+
+        <!-- Tombol Navigasi Sticky (Awalnya tersembunyi dengan opacity-0) -->
+        <div id="navButtons" class="fixed bottom-5 left-0 w-full px-5 flex justify-between items-center z-50 transition-opacity duration-500 opacity-0 pointer-events-none">
+            
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+        class="fixed bottom-6 right-6 z-50 w-11 h-11 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-900 flex items-center justify-center transition-all duration-300 hover:-translate-y-1 active:scale-90 group">
+    <i class="bi bi-arrow-up text-base group-hover:scale-110 transition-transform duration-200"></i>
+</button>
+        </div>
+
+    </div>
+
+    <!-- ⚡ SCRIPTS -->
+<!-- ⚡ SCRIPTS -->
+    <script>
+        // 1. Script Copy to Clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard: ' + text);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // 2. Script Dropdown Bahasa (Gunakan satu versi yang lengkap dengan animasi panah)
+        function toggleLangDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('boxDropdownLang');
+            const arrow = document.getElementById('arrowDropdownLang');
+            
+            dropdown.classList.toggle('hidden');
+            
+            if(dropdown.classList.contains('hidden')) {
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Menutup dropdown jika user klik area kosong di luar tombol
+        window.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('boxDropdownLang');
+            const arrow = document.getElementById('arrowDropdownLang');
+            
+            if (!event.target.closest('#btnDropdownLang') && dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+                if(arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Listener Scroll untuk Tombol Navigasi & Sticky Title
+        window.addEventListener('scroll', function() {
+            const navButtons = document.getElementById('navButtons');
+            const mainTitle = document.getElementById('mainCategoryTitle');
+            const stickyTitle = document.getElementById('stickyCategoryTitle');
+            
+            if (window.scrollY > 9) {
+                navButtons.classList.remove('opacity-0', 'pointer-events-none');
+                navButtons.classList.add('opacity-100');
+            } else {
+                navButtons.classList.add('opacity-0', 'pointer-events-none');
+                navButtons.classList.remove('opacity-100');
+            }
+
+            if (mainTitle && stickyTitle) {
+                if (window.scrollY > (mainTitle.offsetTop + mainTitle.offsetHeight)) {
+                    stickyTitle.style.opacity = "1";
+                } else {
+                    stickyTitle.style.opacity = "0";
+                }
+            }
+        });
+
+function toggleFavorite(button) {
+    const id = button.getAttribute('data-id');
+    const slug = button.getAttribute('data-slug');
+    const title = button.getAttribute('data-title');
+    const url = button.getAttribute('data-url');
+
+    // 1. Eksekusi LocalStorage & UI dulu agar tombol langsung responsif saat diklik
+    let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+    const index = favorites.findIndex(fav => fav.id == id || fav.slug === slug);
+
+    if (index > -1) {
+        favorites.splice(index, 1);
+        button.classList.remove('text-amber-500', 'bg-amber-50', 'border-amber-200');
+        if (button.querySelector('svg')) {
+            button.querySelector('svg').setAttribute('fill', 'none');
+        }
+    } else {
+        favorites.push({ id, slug, title, url });
+        button.classList.add('text-amber-500', 'bg-amber-50', 'border-amber-200');
+        if (button.querySelector('svg')) {
+            button.querySelector('svg').setAttribute('fill', 'currentColor');
+        }
+    }
+
+    localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
+    
+    // Cek apakah fungsi drawer ada sebelum dipanggil agar tidak error
+    if (typeof loadFavoritesToDrawer === 'function') {
+        loadFavoritesToDrawer();
+    }
+
+// Kirim data ke database MySQL
+    fetch('/guest/favorite/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ content_id: parseInt(id) }) // <-- Ubah id menjadi integer dengan parseInt()
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Berhasil
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+// 4. Fungsi untuk Memuat Daftar ke Wadah (Drawer)
+        function loadFavoritesToDrawer() {
+            const container = document.getElementById('favorites-container');
+            if (!container) return;
+
+            let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <p class="text-xs text-gray-400 text-center py-10 italic">
+                        Belum ada konten yang ditandai sebagai favorit.
+                    </p>`;
+                return;
+            }
+
+            let html = '';
+            favorites.forEach(fav => {
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50/50 transition">
+                        <a href="${fav.url}" class="text-xs font-semibold text-gray-700 hover:text-amber-600 line-clamp-1 flex-1">
+                            ${fav.title}
+                        </a>
+                        <button onclick="removeFavorite('${fav.id}')" class="text-gray-300 hover:text-red-500 p-1 ml-2 text-xs font-bold cursor-pointer">
+                            ✕
+                        </button>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // 5. Fungsi Hapus Item dari Drawer
+        function removeFavorite(id) {
+            let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+            favorites = favorites.filter(fav => fav.id !== id);
+            localStorage.setItem('hotel_favorites', JSON.stringify(favorites));
+
+            loadFavoritesToDrawer();
+            updateButtonStates();
+        }
+
+        // 6. Menyesuaikan Status Tombol
+        function updateButtonStates() {
+            const buttons = document.querySelectorAll('.favorite-btn');
+            let favorites = JSON.parse(localStorage.getItem('hotel_favorites')) || [];
+
+            buttons.forEach(button => {
+                const id = button.getAttribute('data-id');
+                const isFav = favorites.some(fav => fav.id === id);
+
+                if (isFav) {
+                    button.classList.add('text-amber-500', 'bg-amber-50', 'border-amber-200');
+                    button.querySelector('svg').setAttribute('fill', 'currentColor');
+                } else {
+                    button.classList.remove('text-amber-500', 'bg-amber-50', 'border-amber-200');
+                    button.querySelector('svg').setAttribute('fill', 'none');
+                }
+            });
+        }
+
+        // 7. Dark Mode Logic
+const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon'); // Ikon Matahari
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');   // Ikon Bulan
+
+        // Cek status theme saat pertama kali halaman dimuat
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');     // Malam: Sembunyikan matahari
+            if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');    // Malam: Tampilkan bulan
+        } else {
+            document.documentElement.classList.remove('dark');
+            if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');    // Siang: Tampilkan matahari
+            if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');       // Siang: Sembunyikan bulan
+        }
+
+        // Fungsi saat tombol diklik
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');
+                if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+            } else {
+                localStorage.setItem('theme', 'light');
+                if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+                if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');
+            }
+        }
+        
+        function updateThemeIcons(theme) {
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            
+            if (!lightIcon || !darkIcon) return;
+
+            if (theme === 'dark') {
+                darkIcon.classList.remove('hidden');
+                lightIcon.classList.add('hidden');
+            } else {
+                lightIcon.classList.remove('hidden');
+                darkIcon.classList.add('hidden');
+            }
+        }
+
+        // 8. Drawer Toggle untuk Favorit
+        function toggleFavoritesDrawer() {
+            const drawer = document.getElementById('favoritesDrawer');
+            if (drawer) {
+                drawer.classList.toggle('hidden');
+            }
+        }
+
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Cek parameter 'open' untuk buka accordion (kode sebelumnya)
+    const urlParams = new URLSearchParams(window.location.search);
+    const openId = urlParams.get('open');
+    if (openId) {
+        const targetDetails = document.getElementById('content-' + openId);
+        if (targetDetails) {
+            targetDetails.open = true; 
+            targetDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+        }
+    }
+
+    // 2. Sinkronkan status tombol favorite & drawer
+    if (typeof updateButtonStates === 'function') updateButtonStates();
+    if (typeof loadFavoritesToDrawer === 'function') loadFavoritesToDrawer();
+
+    // 3. BARU: Otomatis bungkus tabel agar hanya tabelnya saja yang bisa di-scroll horizontal
+    document.querySelectorAll('.custom-content-table table').forEach(table => {
+        // Cek apakah tabel sudah dibungkus sebelumnya agar tidak double
+        if (!table.parentElement.classList.contains('overflow-x-auto')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'overflow-x-auto w-full my-2';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+        }
+    });
+});
+
+function searchContent() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase().trim();
+    const items = document.querySelectorAll('.searchable-item');
+    const noResultsMsg = document.getElementById('noResultsMessage');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+        // Mengambil seluruh teks di dalam kartu (judul, isi, dll) dan ubah ke huruf kecil
+        const text = item.textContent.toLowerCase();
+        
+        // Cek apakah teks mengandung kata yang diketik di input
+        if (text.includes(filter)) {
+            item.style.display = ''; // Tampilkan kembali
+            visibleCount++;
+        } else {
+            item.style.display = 'none'; // Sembunyikan jika tidak cocok
+        }
+    });
+
+    // Menampilkan atau menyembunyikan pesan "Pencarian tidak ditemukan"
+    if (visibleCount === 0 && filter !== '') {
+        noResultsMsg.classList.remove('hidden');
+    } else {
+        noResultsMsg.classList.add('hidden');
+    }
+}
+
+    
+    </script>
+    
+</body>
+</html>
