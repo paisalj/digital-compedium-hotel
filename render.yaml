@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: digital-compedium-hotel
+    env: php
+    plan: free
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APACHE_DOCUMENT_ROOT
+        value: /var/www/html/public
