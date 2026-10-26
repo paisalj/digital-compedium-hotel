@@ -188,7 +188,7 @@
                                             <div class="flex items-center gap-4">
                                                 <div class="w-20 h-20 border border-slate-200 rounded-lg flex items-center justify-center bg-slate-50 overflow-hidden shadow-inner shrink-0">
                                                     <img id="preview-{{ $setting->id }}" 
-                                                         src="{{ $setting->value ? asset('storage/' . $setting->value) : asset('images/no-image.png') }}" 
+                                                         src="{{ $setting->value ? asset('$setting->value) : asset('images/no-image.png') }}" 
                                                          class="w-full h-full object-cover"
                                                          onerror="this.src='https://placehold.co/100?text=No+Image'">
                                                 </div>
@@ -305,7 +305,7 @@
                      onclick="selectImage('{{ asset('storage/'.$item->file_path) }}', '{{ $item->file_path }}', this)">
                     
                     <div class="w-full h-28 overflow-hidden rounded-lg bg-slate-100 flex items-center justify-center">
-                        <img src="{{ asset('storage/'.$item->file_path) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <img src="{{ asset($item->file_path) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
                     
                     <p class="text-[11px] text-gray-700 mt-2 truncate text-center font-medium bg-gray-50 py-1 px-1 rounded-md">
