@@ -188,7 +188,7 @@
                                             <div class="flex items-center gap-4">
                                                 <div class="w-20 h-20 border border-slate-200 rounded-lg flex items-center justify-center bg-slate-50 overflow-hidden shadow-inner shrink-0">
                                                     <img id="preview-{{ $setting->id }}" 
-                                                         src="{{ $setting->value ? asset('$setting->value) : asset('images/no-image.png') }}" 
+                                                         src="{{ $setting->value ? asset($setting->value) : asset('images/no-image.png') }}" 
                                                          class="w-full h-full object-cover"
                                                          onerror="this.src='https://placehold.co/100?text=No+Image'">
                                                 </div>
