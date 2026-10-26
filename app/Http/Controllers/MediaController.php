@@ -32,7 +32,6 @@ public function index(Request $request)
 
 public function store(Request $request)
 {
-    // 1. Validasi: alt_text sekarang 'required' (wajib)
     $request->validate([
         'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         'alt_text' => 'required|string|max:255', 
@@ -41,24 +40,27 @@ public function store(Request $request)
     if ($request->file('file')) {
         $file = $request->file('file');
         
-        // 2. Simpan file ke server
         $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs('uploads', $fileName, 'public');
+        
+        // Simpan langsung ke folder public/uploads di dalam folder public project Anda
+        $file->move(public_path('uploads'), $fileName);
+        
+        // Path yang disimpan ke database
+        $filePath = 'uploads/' . $fileName;
 
-        // 3. Simpan data ke database (langsung gunakan alt_text dari input form)
         Media::create([
             'file_name' => $fileName,
             'file_path' => $filePath,
             'file_type' => $file->extension(),
             'mime_type' => $file->getClientMimeType(),
             'file_size' => $file->getSize(),
-            'alt_text' => $request->alt_text, // Mengambil langsung dari form
+            'alt_text' => $request->alt_text,
         ]);
 
-        // 4. Kembali ke halaman utama dengan pesan sukses
-        return redirect()->route('admin.media.index')->with('success', 'Gambar berhasil diunggah ke Media Library!');
+        return redirect()->route('admin.media.index')->with('success', 'Gambar berhasil diunggah!');
     }
 }
+
 public function create()
 {
     return view('admin.media.create');

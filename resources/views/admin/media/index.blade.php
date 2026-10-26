@@ -88,10 +88,10 @@
                 @forelse($media as $item)
                     <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition group relative">
                         <!-- Tampilan Gambar -->
-                        <div class="w-full h-32 bg-gray-100 flex items-center justify-center">
-                            <img src="{{ asset('storage/' . $item->file_path) }}" alt="{{ $item->alt_text ?? 'Media' }}" class="w-full h-full object-cover">
-                        </div>
-                        
+<div class="w-full h-32 bg-gray-100 flex items-center justify-center">
+    <!-- Cukup panggil asset langsung dengan path dari database -->
+    <img src="{{ asset($item->file_path) }}" alt="{{ $item->alt_text ?? 'Media' }}" class="w-full h-full object-cover">
+</div>                        
                         <!-- Navigasi Halaman -->
 <!-- Informasi File -->
 <!-- Informasi File -->
