@@ -284,7 +284,7 @@
         
         html.dark body {
             background-image: linear-gradient(rgba(15, 23, 42, 0.90), rgba(15, 23, 42, 0.90)), 
-                              url('{{ isset($settings['hotel_background']) && $settings['hotel_background'] ? asset("storage/" . $settings['hotel_background']) : asset("assets/img/default_bg.jpg") }}') !important;
+                              url('{{ isset($settings['hotel_background']) && $settings['hotel_background'] ? asset($settings['hotel_background']) : asset("assets/img/default_bg.jpg") }}') !important;
         }
 
         html.dark .dynamic-sambutan, 
@@ -409,7 +409,7 @@
                 
                 <!-- Logo Bulat -->
                 <div class="logo-container animate-fade-in delay-100">
-                    <img src="{{ isset($settings['hotel_logo']) && $settings['hotel_logo'] ? asset('storage/' . $settings['hotel_logo']) : asset('assets/img/logo.jpeg') }}" alt="Logo Hotel">
+                    <img src="{{ isset($settings['hotel_logo']) && $settings['hotel_logo'] ? asset($settings['hotel_logo']) : asset('assets/img/logo.jpeg') }}" alt="Logo Hotel">
                 </div>
 
                 <!-- NAMA HOTEL & BINTANG -->
