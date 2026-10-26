@@ -321,7 +321,7 @@ class="text-sm font-medium text-red-600">
          onclick="selectImage('{{ asset('storage/'.$item->file_path) }}', this)"> <!-- Tambahkan parameter 'this' -->
         
         <div class="w-full h-24 overflow-hidden rounded">
-            <img src="{{ asset('storage/'.$item->file_path) }}" class="w-full h-full object-cover">
+            <img src="{{ asset($item->file_path) }}" class="w-full h-full object-cover">
         </div>
         
         <p class="text-[11px] text-gray-700 mt-2 truncate text-center font-medium bg-gray-50 py-1 rounded">
