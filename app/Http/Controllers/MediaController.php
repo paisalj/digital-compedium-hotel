@@ -42,18 +42,23 @@ public function store(Request $request)
         
         $fileName = time() . '_' . $file->getClientOriginalName();
         
-        // Simpan langsung ke folder public/uploads di dalam folder public project Anda
+        // 1. Ambil data ekstensi dan mime type SEBELUM file dipindah
+        $extension = $file->extension();
+        $mimeType = $file->getClientMimeType();
+        $fileSize = $file->getSize();
+
+        // 2. Pindahkan file langsung ke folder public/uploads
         $file->move(public_path('uploads'), $fileName);
         
-        // Path yang disimpan ke database
         $filePath = 'uploads/' . $fileName;
 
+        // 3. Simpan ke database menggunakan variabel yang sudah ditampung
         Media::create([
             'file_name' => $fileName,
             'file_path' => $filePath,
-            'file_type' => $file->extension(),
-            'mime_type' => $file->getClientMimeType(),
-            'file_size' => $file->getSize(),
+            'file_type' => $extension,
+            'mime_type' => $mimeType,
+            'file_size' => $fileSize,
             'alt_text' => $request->alt_text,
         ]);
 
